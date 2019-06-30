@@ -36,7 +36,7 @@ def find_connections(univ_faculty_collection):
         for member in univ_faculty_collection[univ]:
             scholar_page = util.google_search(member+' '+univ)
             if scholar_page:
-                time.sleep(random.randint(2, 5))    # hard code for now
+                time.sleep(random.randint(0, 2))    # hard code for now
                 connection = util.parse_scholar(scholar_page)
                 connection = util.process_institutions(connection)
                 if connection:
@@ -46,12 +46,30 @@ def find_connections(univ_faculty_collection):
         con.write(str(connections))
     return connections
 
-def compute_frequency(connections, top_k):
+def compute_frequency(connections, top_k=10):
     '''
-
+    this function counts the connections, each institute's each occurrance counts for once
+    params:
+        connections: returned by find_connections
+        defaultdict of defaultdict, key: university name, value: defaultdict, 
+                                    secondary key: faculty member's name, secondary value: list of cooperating institutions 
+        top_k: int, count the first top_k connections of a faculty member, default to 10, same as that in util.parse_scholar
+    return value:
+        count: defaultdict of defaultdict, key: university name, value: defaultdict,
+                                           secondary key: institute's name, secondary key: number of occurrance
     '''
-    raise NotADirectoryError
+    counts = defaultdict(defaultdict)
+    for univ in connections:
+        count = defaultdict(int)
+        for member in connections[univ]:
+            for institute in connections[univ][member]:
+                count[institute] += 1
+        counts[univ] = sorted(count.items(), key=lambda x: x[1], reverse=True)
+    with open('count', 'w') as cnt:
+        cnt.write(str(counts))
+    return counts
 
 if __name__ == '__main__':
     univ_faculty_collection = univ_collection()
-
+    connection = find_connections(univ_faculty_collection)
+    count = compute_frequency(connection)
