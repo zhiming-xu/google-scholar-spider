@@ -65,7 +65,7 @@ def compute_frequency(connections, top_k=10):
             for institute in connections[univ][member]:
                 count[institute] += 1
         counts[univ] = sorted(count.items(), key=lambda x: x[1], reverse=True)
-    with open('count', 'w') as cnt:
+    with open('counts', 'w') as cnt:
         cnt.write(str(counts))
     return counts
 
