@@ -42,34 +42,43 @@ def crawl_faculty_list(configs):
         university_faculy[config['university']] = s.xpath(config['xpath'])
     return university_faculy
 
-def extract_name(raw_list):
+def extract_name(raw_dict):
     '''
     this function processes Chinese name, removing irrelevant title and punctuations
     params:
-        a raw string returned by crawler containing faculty names (Professor, Associate Professor, Lecturer)
-        might also mix with title and degree
+        a defaultdict returned by crawl_faculty_list containing faculty names, including 
+        Professor, Associate Professor and Lecturer, might also mixed with position, title and degree
     return value:
-        a list of the same length, each corresponding entry is a Chinese name, without any other attributes
+        a defaultdict, each corresponding entry is a Chinese name, without any other attributes
     '''
-    for idx in range(len(raw_list)):
-        raw_list[idx] = raw_list[idx].split(r' ')[0]
-    return raw_list
+    for univ in raw_dict:
+        for idx in range(len(raw_dict[univ])):
+            name = raw_dict[univ][idx].replace(' ', '')
+            name = name.split('(')[0].split('（')[0]
+            raw_dict[univ][idx] = name
+    return raw_dict
 
-def name_to_pinyin(name_list):
+def name_to_pinyin(zh_dict):
     '''
     this functions converts Chinese name (characters) to pinyin for searching in Google Scholar
     params:
-        a list, whose element is a string representing a Chinese name (a few characters)
+        a defaultdict, returned by extract_name
     return value:
-        a list of the same length, each corresponding entry is a converted name in pinyin,
+        a defaultdict, each corresponding entry is a converted name in pinyin,
         with form '[given name] [surname]'
     '''
-    for idx in range(len(name_list)):
-        full_name = lazy_pinyin(name_list[idx])
-        # FIXME: this method only works for surname of exactly one character, 
-        # and does not take into composite surname, such as 欧阳
-        surname = full_name[0]
-        give_name = full_name[1:]
-        pinyin_name = give_name + ' ' + surname
-        name_list[idx] = pinyin_name
-    return name_list
+    for univ in zh_dict:
+        for idx in range(len(zh_dict[univ])):
+            # FIXME: this method only works for surname of exactly one character, 
+            # and does not take into composite surname, such as 欧阳
+            full_name_zh = zh_dict[univ][idx]
+            surname = lazy_pinyin(full_name_zh[0])     # now surname is a list of str
+            give_name = lazy_pinyin(full_name_zh[1:])  # now given_name is a list of str
+            full_name_pinyin = ''
+            for char in give_name:
+                full_name_pinyin += char
+            full_name_pinyin += ' '
+            for char in surname:
+                full_name_pinyin += char
+            zh_dict[univ][idx] = full_name_pinyin
+    return zh_dict
