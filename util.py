@@ -26,6 +26,10 @@ socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:p
 with open('search.json', 'r') as googles:
     google_sites = json.load(googles)
 
+# rules for parsing google scholar list
+interested_parties = ['university', 'U', 'academy', 'institute', 'tencent', 'microsoft', 'google', 'facebook', 'amazon', \
+                      'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang']
+
 def read_config(filename='config.json'):
     '''
     this function read configuration from config.json, which stores university name, url, xpath
@@ -161,20 +165,30 @@ def process_institutions(raw_list):
     return value:
         a list of the same length, each corresponding entry contains only the name of a coauthor's institution
     '''
+    processed_list = []
     if raw_list == None:
-        return None
+        return processed_list
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
-        univ = raw_list[idx].split(',')[-1]
-        univ = raw_list[idx].split('/')[-1]
-        univ = univ.lower()
-        # remove leading and trailing white space
-        if univ[0]==' ':
-            univ = univ[1:]
-        if univ[-1]==' ':
-            univ = univ[:-1]
-        # remove leading "the", in case that some university named both w/ and w/o "the"
-        if univ[:4]=='the ':
-            univ = univ[4:]
-        raw_list[idx] = univ
-    return raw_list
+        entities = raw_list[idx].lower().split(', ')
+        if len(entities)<=2:
+            processed_list.append(entities[-1])
+            continue
+        # only look for universities and a few companies now
+        found = False
+        entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
+        for entity in entities:
+            for party in interested_parties:
+                if party in entity:
+                    found = True
+                    # remove leading white space
+                    while entity[0]==' ':
+                        entity = entity[1:]
+                    while entity[-1]==' ':
+                        entity = entity[:-1]
+                    # <del>remove leading "the", in case that some university named both w/ and w/o "the"</del>
+                    processed_list.append(entity)
+                    break   # we will assume that each person is affiliated with only one institution
+            if found:
+                break
+    return processed_list
