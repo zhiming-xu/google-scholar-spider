@@ -1,0 +1,14 @@
+[
+    {"region": "global", "url": "https://www.google.com/search?&q="},  
+    {"region": "japan", "url": "https://www.google.co.jp/search?&q="}, 
+    {"region": "hong kong", "url": "https://www.google.com.hk/search?&q="},
+    {"region": "singapore", "url":"https://www.google.com.sg/search?&q="},
+    {"region": "south korea", "url": "https://www.google.co.kr/search?&q="}, 
+    {"region": "malaysia", "url": "https://www.google.com.my/search?&q="},
+    {"region": "india", "url": "https://www.google.co.in/search?&q="},
+    {"region": "vietnam", "url": "https://www.google.com.vn/search?&q="},
+    {"region": "thailand", "url":"https://www.google.co.th/search?&q="},
+    {"region": "australia", "url":"https://www.google.com.au/search?&q="},
+    {"region": "united kingdom", "url":"https://www.google.co.uk/search?&q="},
+    {"region": "indonesia", "url":"https://www.google.co.id/search?&q="}
+]
