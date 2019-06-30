@@ -2,6 +2,7 @@
     {
         "university": "Nanjing University",
         "url": "http://cs.nju.edu.cn/1651/list.htm",
-        "xpath": "//div[position()<4][@id='wp_news_w82']/ul/li/table/tr/td/ul/li/div/span/a/text()"
+        "xpath": "//div[position()<4][@id='wp_news_w82']/ul/li/table/tr/td/ul/li/div/span/a/text()",
+        "alias": "nju"
     }
 ]

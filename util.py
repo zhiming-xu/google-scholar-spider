@@ -19,7 +19,7 @@ header = \
         }
 
 # proxy to access Google services
-socks5 = dict(http='socks5h://user:pass@127.0.0.1:1080', https='socks5h://user:pass@127.0.0.1:1080')
+socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:pass@localhost:1080')
 
 # read all alternative google sites provided by search.json
 # search with them randomly to avoid being blocked by google (shamelessly +1)
@@ -42,7 +42,7 @@ def crawl_faculty_list(configs):
     '''
     this function crawl faculty list according to configs
     params:
-        a list, each entry is a dict, key is university name ("university"), target website ("url"), and
+        configs: list, each entry is a dict, key is university name ("university"), target website ("url"), and
         target path ("xpath")
     return value:
         a defaultdict, each key is a university, and the value is a 'raw' list of faculty list
@@ -59,7 +59,7 @@ def extract_name(raw_dict):
     '''
     this function processes Chinese name, removing irrelevant title and punctuations
     params:
-        a defaultdict returned by crawl_faculty_list containing faculty names, including 
+        raw_dict: defaultdict returned by crawl_faculty_list containing faculty names, including 
         Professor, Associate Professor and Lecturer, might also mixed with position, title and degree
     return value:
         a defaultdict, each corresponding entry is a Chinese name, without any other attributes
@@ -75,7 +75,7 @@ def name_to_pinyin(zh_dict):
     '''
     this functions converts Chinese name (characters) to pinyin for searching in Google Scholar
     params:
-        a defaultdict, returned by extract_name
+        zh_dict: defaultdict, returned by extract_name
     return value:
         a defaultdict, each corresponding entry is a converted name in pinyin,
         with form '[given name] [surname]'
@@ -100,11 +100,12 @@ def google_search(query):
     '''
     this function searches for a given query on Google
     params:
-        query, a string containing a faculty member's pinyin name with the affiliated institution for disambiguity
+        query: str, containing a faculty member's pinyin name with the affiliated institution for disambiguity,
         an example: "san zhang nju"
     return value:
         the hyperref to this faculty member's Google Scholar page
     '''
+    query = query.lower()
     region_url = random.choice(google_sites)
     region = region_url['region']
     url_prefix = region_url['url']
@@ -125,13 +126,48 @@ def google_search(query):
     # the first result containing an href to google scholar should be his/hers
     return url
 
-def parse_scholar(url):
+def parse_scholar(url, top_k):
     '''
     this function browse the google scholar page returned by google_search, and return a list of institutions with
     which this faculty member has cooperated
     params:
-        a url to the faculty member's google scholar page
+        url: str, a url to the faculty member's google scholar page
+        top_k: int, include how many coauthors' institutions from top to bottom
     return value:
-        a list, each entry is a name of some institution, might have duplicates
+        a list, each entry is a name of a coauthor's affiliated institution, might have also include his/her title/position,
+        need to be furthur processed
     '''
-    raise NotImplementedError
+    try:
+        page = requests.get(url, headers=header, proxies=socks5).text
+    except:
+        print('Error occurred when browsing google scholar page at {}'.format(url))
+        return None
+    tree = etree.HTML(page)
+    raw_list = tree.xpath('//*[@id="gsc_rsb_co"]/ul/li/div/span[2]/span[1]')
+    raw_list = raw_list[:top_k]
+    return raw_list
+
+def process_institutions(raw_list):
+    '''
+    this function processes the list returned by parse_scholar, remove potential title/position in each entry, and
+    (hopefully) only preserve the full name of an institution
+    params:
+        raw_list: list of str, each entry is some raw information about a coauthor
+    return value:
+        a list of the same length, each corresponding entry contains only the name of a coauthor's institution
+    '''
+    for idx in range(len(raw_list)):
+        # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
+        univ = raw_list[idx].split(',')[-1]
+        univ = raw_list[idx].split('/')[-1]
+        univ = univ.lower()
+        # remove leading and trailing white space
+        if univ[0]==' ':
+            univ = univ[1:]
+        if univ[-1]==' ':
+            univ = univ[:-1]
+        # remove leading "the", in case that some university named both w/ and w/o "the"
+        if univ[:4]=='the ':
+            univ = univ[4:]
+        raw_list[idx] = univ
+    return raw_list
