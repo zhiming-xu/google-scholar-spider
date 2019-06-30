@@ -26,11 +26,11 @@ socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:p
 with open('search.json', 'r') as googles:
     google_sites = json.load(googles)
 
-def read_config(filename):
+def read_config(filename='config.json'):
     '''
     this function read configuration from config.json, which stores university name, url, xpath
     params:
-        None
+        filename: str, path to the config file, default is "config.json" 
     return value:
         a list, each entry is a dict, key is "university", "url" and "xpath"
     '''
@@ -116,17 +116,22 @@ def google_search(query):
         page = requests.get(url=search_url, headers=header, proxies=socks5).text
     except:
         print('Error occurred when browsing with url {} in region {}'.format(url_prefix, region))
-        return None
+        if url_prefix != google_sites[0]:
+            page = requests.get(url=google_sites[0], headers=header, proxies=socks5).text
+        else:
+            return None
     sp = BeautifulSoup(page, "html.parser")
     for link in sp.find_all('a'):
         url = link.get('href')
         if url and 'scholar.google.com' in url:
-            break
-    # we assume that after restricting query to a faculty member's name and affiliated institution,
-    # the first result containing an href to google scholar should be his/hers
-    return url
+            # we assume that after restricting query to a faculty member's name and affiliated institution,
+            # the first result containing an href to google scholar should be his/hers
+            return url
+    # if not found on the first page (so it is very likely this member does not have a google scholar page),
+    # just return None
+    return None
 
-def parse_scholar(url, top_k):
+def parse_scholar(url, top_k=10):
     '''
     this function browse the google scholar page returned by google_search, and return a list of institutions with
     which this faculty member has cooperated
@@ -143,7 +148,7 @@ def parse_scholar(url, top_k):
         print('Error occurred when browsing google scholar page at {}'.format(url))
         return None
     tree = etree.HTML(page)
-    raw_list = tree.xpath('//*[@id="gsc_rsb_co"]/ul/li/div/span[2]/span[1]')
+    raw_list = tree.xpath('//*[@id="gsc_rsb_co"]/ul/li/div/span[2]/span[1]/text()')
     raw_list = raw_list[:top_k]
     return raw_list
 
@@ -156,6 +161,8 @@ def process_institutions(raw_list):
     return value:
         a list of the same length, each corresponding entry contains only the name of a coauthor's institution
     '''
+    if raw_list == None:
+        return None
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
         univ = raw_list[idx].split(',')[-1]
