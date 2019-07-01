@@ -28,5 +28,11 @@
         "url": "http://www.cs.fudan.edu.cn/?cat=132&t1=zz2",
         "xpath": "//dl[@class='ui-tch-dl']/dd[position()!=1]/a/text()",
         "alias": "fdu"
+    },
+    {
+        "university": "Wuhan University",
+        "url": "http://cs.whu.edu.cn/teachersearch.aspx",
+        "xpath": "//td[@class='w1']/a/text()",
+        "alias": "whu"
     }
 ]

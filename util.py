@@ -23,8 +23,9 @@ with open('search.json', 'r') as googles:
 
 # rules for parsing google scholar list
 interested_parties = {'composite': ['university', 'academy', 'institute'],
-                      'single':  ['cas', 'hkust', 'eth', 'tencent', 'microsoft', 'google', 'facebook', 'amazon', 'uber', 'intel', \
-                      'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang', 'meituan', 'jd', 'didi']}
+                      'single':  ['cas', 'hkust', 'eth', 'mit', 'tencent', 'microsoft', 'google', \
+                      'facebook', 'amazon', 'uber', 'intel', 'aws', 'apple', 'alibaba', 'baidu', \
+                      'sensetime', 'face++', 'huawei', 'samsang', 'meituan', 'jd', 'didi']}
 
 def read_config(filename='config.json'):
     '''

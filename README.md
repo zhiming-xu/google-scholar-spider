@@ -5,6 +5,10 @@ depends solely on yourself: your idea, belief, personal experiences and/or any o
 attitude towards it. I modify nothing but make the data more readable and concise. There are a few issues which can produce potential
 mistakes. They are discussed in the following [Known Issues](#Known-Issues) part and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that part as well as codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
 
+## Quick view
+This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions other than the target institution. The y-axis shows the number of unique collaborated institutions. The relative size of each circle represents the total times of occurrences of all collaborated institutions, i.e., each time a specific institution shows up, it counts once.
+
+![demo](result.png)
 ## Introduction
 ### Intuition
 TODO
@@ -31,8 +35,8 @@ Then the two file described above will be generated.
 
 ### Note
 - The searching and parsing process involves visiting Google websites and services. If these resources are not directly accessible from your area, you might need to come up with some way to break out of such restriction.
-- Running this program takes some time and you should be careful not to crawl too harshly in case that Google bans your IP. The `cooling_down` time for browsing Google Scholar sites can be set in [`main.find_connections`](main.py).
-- I have included a number of alternative sites for google.com. I believe it is less likely to be recognized as a bot when googling. So I do not perform cooling down for [`util.google_search`](util.py).
+- Running this program takes some time and you should be careful not to crawl too harshly in case that Google bans your IP. <del>The `cooling_down` time for browsing Google Scholar sites can be set in [`main.find_connections`](main.py).</del> I have checked `robots.txt` of Google Scholar, it says that the `/citations?user=` pages can be crawled, which is exactly what we need.
+- I have included a number of alternative sites for google.com. I believe in this way the crawler will be less likely to be identified as a bot when googling. So I do not perform cooling down for [`util.google_search`](util.py).
 
 ## Known Issues
 ### Name extracting
