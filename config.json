@@ -16,5 +16,17 @@
         "url": "https://cs.ustc.edu.cn/2010/0614/c3052a23931/page.htm",
         "xpath": "(//td[@class='dhlm'])[position()<5]/table/tbody/tr/td/div/a/text()",
         "alias": "ustc"
+    },
+    {
+        "university": "Shanghai Jiaotong University",
+        "url": "http://www.cs.sjtu.edu.cn/Faculty.aspx",
+        "xpath": "//div[@class='Faculty']/ul/li/a/text()",
+        "alias": "sjtu"
+    },
+    {
+        "university": "Fudan University",
+        "url": "http://www.cs.fudan.edu.cn/?cat=132&t1=zz2",
+        "xpath": "//dl[@class='ui-tch-dl']/dd[position()!=1]/a/text()",
+        "alias": "fdu"
     }
 ]

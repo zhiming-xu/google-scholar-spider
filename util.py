@@ -7,17 +7,11 @@ from lxml import etree
 from bs4 import BeautifulSoup
 import random
 import re
+random.seed(9102)
 
-# pretend to browse with Chrome 72 on Windows 10 (shamelessly)
-
-header = \
-        {'Accept': '*/*',
-               'Accept-Language': 'zh,zh-CN,en-US,en;q=0.8',
-               'Cache-Control': 'max-age=0',
-               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
-               'Connection': 'keep-alive',
-               'Referer': 'https://www.google.com/'
-        }
+# pretend to browse with some browsers on some platform (shamelessly)
+with open('user-agent.json', 'r') as ug:
+    headers = json.load(ug)
 
 # FIXME proxy to access Google services, change this according to your config
 socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:pass@localhost:1080')
@@ -28,8 +22,10 @@ with open('search.json', 'r') as googles:
     google_sites = json.load(googles)
 
 # rules for parsing google scholar list
-interested_parties = ['university', 'u', 'academy', 'institute', 'tencent', 'microsoft', 'google', 'facebook', 'amazon', \
-                      'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang']
+interested_parties = {'education': ['university', 'hkust', 'academy', 'institute'], 
+                      'company':  ['tencent', 'microsoft', 'google', 'facebook', 'amazon', 'uber', 'intel', \
+                      'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang', 'meituan',
+                      'jd', 'didi']}
 
 def read_config(filename='config.json'):
     '''
@@ -60,8 +56,9 @@ def crawl_faculty_list(configs, target_alias=None):
     for univ in configs:
         if target_alias is not None and univ['alias'] not in target_alias:
             continue
+        header = random.choice(headers)
         req = requests.get(univ['url'], headers=header)
-        req.encoding = req.apparent_encoding
+        req.encoding = 'gbk' if req.apparent_encoding=='GB2312' else req.apparent_encoding
         text = req.text
         tree = etree.HTML(text)
         university_faculty[univ['university']] = tree.xpath(univ['xpath'])
@@ -81,7 +78,6 @@ def extract_name(raw_dict):
             char_list = raw_dict[univ][idx].split(' ')
             if len(char_list[0])>1:
                 name = char_list[0]
-                print(name)
             else:
                 name = raw_dict[univ][idx]
             name = name.replace(u'\u3000', u' ')
@@ -131,6 +127,7 @@ def google_search(query):
     url_prefix = region_url['url']
     # query = query.replace(' ', '+') # convert space to + to insert in searching url
     search_url = url_prefix + query
+    header = random.choice(headers)
     # FIXME: I have already found some mistakes made by googling like this, e.g., an irrelevant faculty found
     try:
         page = requests.get(url=search_url, headers=header, proxies=socks5).text
@@ -162,6 +159,7 @@ def parse_scholar(url, top_k=10):
         a list, each entry is a name of a coauthor's affiliated institution, might have also include his/her title/position,
         need to be furthur processed
     '''
+    header = random.choice(headers)
     try:
         page = requests.get(url, headers=header, proxies=socks5).text
     except:
@@ -187,28 +185,30 @@ def process_institutions(raw_list):
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
         entities = raw_list[idx].lower().split(', ')
-        if len(entities)<=2:
+        if len(entities)==1:
             processed_list.append(entities[-1])
             continue
         # only look for universities and a few companies now
         found = False
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
         for entity in entities:
-            for party in interested_parties:
-                if party in entity:
-                    found = True
-                    # remove leading white space
-                    while entity[0]==' ':
-                        entity = entity[1:]
-                    while entity[-1]==' ':
-                        entity = entity[:-1]
-                    # <del>remove leading "the", in case that some university named both w/ and w/o "the"</del>
-                    # replace "&" with "and"
-                    entity.replace('&', 'and')
-                    # replace other punctuations, preserving only alphabet, digit, and white space
-                    entity = re.sub(r'[^a-zA-z0-9 ]', '', entity)
-                    processed_list.append(entity)
-                    break   # we will assume that each person is affiliated with only one institution
+            for ins in interested_parties:
+                for party in interested_parties[ins]:
+                    if party in entity:
+                        found = True
+                        # remove leading white space
+                        while entity[0]==' ':
+                            entity = entity[1:]
+                        while entity[-1]==' ':
+                            entity = entity[:-1]
+                        # replace "&" with "and"
+                        entity.replace('&', 'and')
+                        # replace other punctuations, preserving only alphabet, digit, and white space
+                        entity = re.sub(r'[^a-zA-z0-9 ]', '', entity)
+                        processed_list.append(entity if ins!='company' else party)
+                        break   # we will assume that each person is affiliated with only one institution
+                if found:
+                    break
             if found:
                 break
     return processed_list

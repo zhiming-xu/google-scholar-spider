@@ -1,4 +1,5 @@
 import util
+import json
 from collections import defaultdict
 import random
 import time
@@ -28,7 +29,7 @@ def find_connections(univ_faculty_collection):
         name attached to them
     return value:
         defaultdict of defaultdict, key: university name, value: defaultdict, 
-                                    secondary key: faculty member's name, secondary value: list of cooperating institutions 
+                                    secondary key: faculty member's name, secondary value: list of cooperating institutions
     '''
     connections = defaultdict(defaultdict)
     for univ in univ_faculty_collection:
@@ -36,14 +37,14 @@ def find_connections(univ_faculty_collection):
         for member in univ_faculty_collection[univ]:
             scholar_page = util.google_search(member+' '+univ)
             if scholar_page:
-                time.sleep(random.randint(5, 8))    # hard code for now
+                time.sleep(random.randint(0, 1))    # hard code for now
                 connection = util.parse_scholar(scholar_page)
                 connection = util.process_institutions(connection)
                 if connection:
                     connection_dict[member] = connection
         connections[univ] = connection_dict
-    with open('connections', 'w') as con:
-        con.write(str(connections))
+    with open('connections.json', 'w') as con:
+        json.dump(dict(connections), con)
     return connections
 
 def compute_frequency(connections, top_k=10):
@@ -65,8 +66,9 @@ def compute_frequency(connections, top_k=10):
             for institute in connections[univ][member]:
                 count[institute] += 1
         counts[univ] = sorted(count.items(), key=lambda x: x[1], reverse=True)
-    with open('counts', 'w') as cnt:
-        cnt.write(str(counts))
+    counts = dict(counts)
+    with open('counts.json', 'w') as cnt:
+        json.dump(dict(counts), cnt)
     return counts
 
 if __name__ == '__main__':
