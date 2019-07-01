@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 from collections import defaultdict
+from itertools import cycle
+
+color_cycle = cycle('bgrcmk')
 
 def load_data(filename):
     '''
@@ -35,7 +38,9 @@ def compute_total_connection(connections):
         cnt = 0
         for member in connections[univ]:
             cnt += len(connections[univ][member])
-        t_avg_con = {'total': cnt, 'avg': cnt/len(connections[univ])}
+        t_avg_con = defaultdict(float)
+        t_avg_con['total'] = cnt
+        t_avg_con['avg'] = cnt/len(connections[univ])
         t_avg_cons[univ] = t_avg_con
     return t_avg_cons
 
@@ -46,20 +51,50 @@ def compute_inner_connection(counts, t_avg_cons):
         counts: dict of dict, saved by main.compute_frequency
             key: institution name, value: dict,
             secondary key: institute's name, secondary key: number of occurrance
-        t_avg_cons: dict of dict, returned by compute_total_connection
+        t_avg_cons: dict of defaultdict, returned by compute_total_connection
             key: institution name, value: dict
             secondary key: 'total', 'avg', value: total connections, avg per member
     return value:
-        dict:
+        defaultdict:
             key: institution name, value: dict
             secondary key: 'total', 'avg', 'inner', value: total connections,
             avg per member, ratio of inner connections
     '''
     for univ in counts:
         for ins in counts[univ]:
-            if ins.lower()==univ:
-                t_avg_cons[univ]['inner'] = counts[univ][ins] / t_avg_cons[univ]['total']
-                t_avg_cons[univ]['unique'] = len(counts[univ])
-                break
+            if ins[0].replace(' ', '') == univ.replace(' ', '').lower():
+                t_avg_cons[univ]['inner'] += ins[1] / t_avg_cons[univ]['total']
+                t_avg_cons[univ]['unique'] += len(counts[univ])
     return t_avg_cons
 
+def plot_field(stat):
+    '''
+    this function will visualize the data we collect, with x-axis being outer connection ratio,
+    and y-axis being number of unique connections, size of plot being total connections
+    params:
+        stat: dict of dict
+            key: institution name, value: dict
+            secondary key: 'total', 'avg', 'inner', 'unique'
+    return value:
+        none
+    '''
+    plt.figure(figsize=(14, 10))
+    plt.xlabel('collaborated')
+    plt.xlim(0.71, .9)
+    plt.ylabel('connected')
+    plt.ylim(100, 400)
+    for univ in stat:
+        plt.scatter(1-stat[univ]['inner'], stat[univ]['unique'], \
+                    s=stat[univ]['total']*10, c=next(color_cycle), alpha=.7)
+        if 'Technology' in univ:
+            plt.annotate(univ, (1-stat[univ]['inner'], stat[univ]['unique']), (1-stat[univ]['inner']-.025, stat[univ]['unique']+20))
+        else:
+            plt.annotate(univ, (1-stat[univ]['inner'], stat[univ]['unique']), (1-stat[univ]['inner']-.01, stat[univ]['unique']+20))
+    plt.savefig('result.png')
+
+def show():
+    con = load_data('connections.json')
+    cnt = load_data('counts.json')
+    t_avg = compute_total_connection(con)
+    stat = compute_inner_connection(cnt, t_avg)
+    plot_field(stat)

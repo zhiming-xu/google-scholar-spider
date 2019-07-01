@@ -3,7 +3,7 @@ The data collected by this program comes *wholely* from public domain, i.e., ins
 Google Scholar. Neither does it reflect my personal opinion nor serve as advise of any kind. The way how you interpret it
 depends solely on yourself: your idea, belief, personal experiences and/or any other things that could result in a particular
 attitude towards it. I modify nothing but make the data more readable and concise. There are a few issues which can produce potential
-mistakes. They are discussed in the following [Known Issues](#Known-Issues) and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that part and codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
+mistakes. They are discussed in the following [Known Issues](#Known-Issues) part and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that part as well as codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
 
 ## Introduction
 ### Intuition
@@ -23,7 +23,9 @@ I have tested with the following config
 ### Command (Under development)
 Run the following command in shell.
 
-`$ python3 main.py`
+```
+$ python3 main.py
+```
 
 Then the two file described above will be generated.
 

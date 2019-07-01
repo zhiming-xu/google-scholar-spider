@@ -18,7 +18,7 @@
         "alias": "ustc"
     },
     {
-        "university": "Shanghai Jiaotong University",
+        "university": "Shanghai Jiao Tong University",
         "url": "http://www.cs.sjtu.edu.cn/Faculty.aspx",
         "xpath": "//div[@class='Faculty']/ul/li/a/text()",
         "alias": "sjtu"

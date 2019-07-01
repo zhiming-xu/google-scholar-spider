@@ -33,6 +33,7 @@ def find_connections(univ_faculty_collection):
     '''
     connections = defaultdict(defaultdict)
     for univ in univ_faculty_collection:
+        s_time = time.time()
         connection_dict = defaultdict()
         for member in univ_faculty_collection[univ]:
             scholar_page = util.google_search(member+' '+univ)
@@ -43,6 +44,8 @@ def find_connections(univ_faculty_collection):
                 if connection:
                     connection_dict[member] = connection
         connections[univ] = connection_dict
+        print('-----finish connection finding for {} after {:.5} sec-----'.format(univ, time.time()-s_time))
+        s_time = time.time()
     with open('connections.json', 'w') as con:
         json.dump(dict(connections), con)
     return connections
@@ -66,7 +69,6 @@ def compute_frequency(connections, top_k=10):
             for institute in connections[univ][member]:
                 count[institute] += 1
         counts[univ] = sorted(count.items(), key=lambda x: x[1], reverse=True)
-    counts = dict(counts)
     with open('counts.json', 'w') as cnt:
         json.dump(dict(counts), cnt)
     return counts
