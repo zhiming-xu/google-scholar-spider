@@ -6,19 +6,20 @@ import requests
 from lxml import etree
 from bs4 import BeautifulSoup
 import random
+import re
 
 # pretend to browse with Chrome 72 on Windows 10 (shamelessly)
 
 header = \
         {'Accept': '*/*',
-               'Accept-Language': 'en-US,en;q=0.8',
+               'Accept-Language': 'zh,zh-CN,en-US,en;q=0.8',
                'Cache-Control': 'max-age=0',
                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
                'Connection': 'keep-alive',
                'Referer': 'https://www.google.com/'
         }
 
-# proxy to access Google services
+# FIXME proxy to access Google services, change this according to your config
 socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:pass@localhost:1080')
 
 # read all alternative google sites provided by search.json
@@ -27,7 +28,7 @@ with open('search.json', 'r') as googles:
     google_sites = json.load(googles)
 
 # rules for parsing google scholar list
-interested_parties = ['university', 'U', 'academy', 'institute', 'tencent', 'microsoft', 'google', 'facebook', 'amazon', \
+interested_parties = ['university', 'u', 'academy', 'institute', 'tencent', 'microsoft', 'google', 'facebook', 'amazon', \
                       'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang']
 
 def read_config(filename='config.json'):
@@ -42,20 +43,27 @@ def read_config(filename='config.json'):
         configs = json.load(conf)
     return configs
 
-def crawl_faculty_list(configs):
+def crawl_faculty_list(configs, target_alias=None):
     '''
-    this function crawl faculty list according to configs
+    this function crawl faculty list according to configs, if target_alias is given, only faculty members affiliated
+    with those institutions in it will be crawled
     params:
         configs: list, each entry is a dict, key is university name ("university"), target website ("url"), and
         target path ("xpath")
+        target_alias: list of str, each str is an alias of a target institution. Any alias other than those in config
+        will be ignored without notification
     return value:
         a defaultdict, each key is a university, and the value is a 'raw' list of faculty list
         (Chinese name, potentially with title and degree)
     '''
     university_faculty = defaultdict(list)
     for univ in configs:
-        req = requests.get(univ['url'], headers=header).text
-        tree = etree.HTML(req)
+        if target_alias is not None and univ['alias'] not in target_alias:
+            continue
+        req = requests.get(univ['url'], headers=header)
+        req.encoding = req.apparent_encoding
+        text = req.text
+        tree = etree.HTML(text)
         university_faculty[univ['university']] = tree.xpath(univ['xpath'])
     return university_faculty
 
@@ -70,7 +78,15 @@ def extract_name(raw_dict):
     '''
     for univ in raw_dict:
         for idx in range(len(raw_dict[univ])):
-            name = raw_dict[univ][idx].replace(' ', '')
+            char_list = raw_dict[univ][idx].split(' ')
+            if len(char_list[0])>1:
+                name = char_list[0]
+                print(name)
+            else:
+                name = raw_dict[univ][idx]
+            name = name.replace(u'\u3000', u' ')
+            name = name.replace(u'\xa0', u'')
+            name = name.replace(' ', '')
             name = name.split('(')[0].split('（')[0]
             raw_dict[univ][idx] = name
     return raw_dict
@@ -187,6 +203,10 @@ def process_institutions(raw_list):
                     while entity[-1]==' ':
                         entity = entity[:-1]
                     # <del>remove leading "the", in case that some university named both w/ and w/o "the"</del>
+                    # replace "&" with "and"
+                    entity.replace('&', 'and')
+                    # replace other punctuations, preserving only alphabet, digit, and white space
+                    entity = re.sub(r'[^a-zA-z0-9 ]', '', entity)
                     processed_list.append(entity)
                     break   # we will assume that each person is affiliated with only one institution
             if found:

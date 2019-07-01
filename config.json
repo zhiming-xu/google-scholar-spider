@@ -4,5 +4,17 @@
         "url": "http://cs.nju.edu.cn/1651/list.htm",
         "xpath": "//div[position()<4][@id='wp_news_w82']/ul/li/table/tr/td/ul/li/div/span/a/text()",
         "alias": "nju"
+    },
+    {
+        "university": "Zhejiang University",
+        "url": "http://www.cs.zju.edu.cn/chinese/redir.php?cust=jiaoshiml&id=256",
+        "xpath": "(//td[@class='szdw'])[position()<6]/div/a/text()",
+        "alias": "zju"
+    },
+    {
+        "university": "University of Science and Technology of China",
+        "url": "https://cs.ustc.edu.cn/2010/0614/c3052a23931/page.htm",
+        "xpath": "(//td[@class='dhlm'])[position()<5]/table/tbody/tr/td/div/a/text()",
+        "alias": "ustc"
     }
 ]
