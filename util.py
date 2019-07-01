@@ -22,10 +22,9 @@ with open('search.json', 'r') as googles:
     google_sites = json.load(googles)
 
 # rules for parsing google scholar list
-interested_parties = {'education': ['university', 'hkust', 'academy', 'institute'], 
-                      'company':  ['tencent', 'microsoft', 'google', 'facebook', 'amazon', 'uber', 'intel', \
-                      'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang', 'meituan',
-                      'jd', 'didi']}
+interested_parties = {'composite': ['university', 'academy', 'institute'],
+                      'single':  ['cas', 'hkust', 'eth', 'tencent', 'microsoft', 'google', 'facebook', 'amazon', 'uber', 'intel', \
+                      'aws', 'apple', 'alibaba', 'baidu', 'sense time', 'face++', 'huawei', 'samsang', 'meituan', 'jd', 'didi']}
 
 def read_config(filename='config.json'):
     '''
@@ -185,9 +184,6 @@ def process_institutions(raw_list):
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
         entities = raw_list[idx].lower().split(', ')
-        if len(entities)==1:
-            processed_list.append(entities[-1])
-            continue
         # only look for universities and a few companies now
         found = False
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
@@ -197,15 +193,15 @@ def process_institutions(raw_list):
                     if party in entity:
                         found = True
                         # remove leading white space
-                        while entity[0]==' ':
+                        while entity and entity[0].isalpha() is False:
                             entity = entity[1:]
-                        while entity[-1]==' ':
+                        while entity and entity[-1].isalpha() is False:
                             entity = entity[:-1]
                         # replace "&" with "and"
-                        entity.replace('&', 'and')
+                        entity = entity.replace('&', 'and')
                         # replace other punctuations, preserving only alphabet, digit, and white space
                         entity = re.sub(r'[^a-zA-z0-9 ]', '', entity)
-                        processed_list.append(entity if ins!='company' else party)
+                        processed_list.append(entity if ins!='single' else party)
                         break   # we will assume that each person is affiliated with only one institution
                 if found:
                     break

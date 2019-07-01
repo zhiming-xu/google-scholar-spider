@@ -1,9 +1,7 @@
 import util
 import json
 from collections import defaultdict
-import random
 import time
-random.seed(2333)
 
 def univ_collection():
     '''
@@ -38,7 +36,7 @@ def find_connections(univ_faculty_collection):
         for member in univ_faculty_collection[univ]:
             scholar_page = util.google_search(member+' '+univ)
             if scholar_page:
-                time.sleep(random.randint(0, 1))    # hard code for now
+                # time.sleep(random.randint(0, 1)) -> it appears that crawling google scholar user page is permitted
                 connection = util.parse_scholar(scholar_page)
                 connection = util.process_institutions(connection)
                 if connection:
