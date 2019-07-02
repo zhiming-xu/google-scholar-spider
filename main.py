@@ -3,9 +3,15 @@ import json
 from collections import defaultdict
 import time
 import argparse
+from ast import literal_eval
 
 parser = argparse.ArgumentParser(description="collection connections and save to json")
 parser.add_argument('--range', type=str, default=None, help='the institutions you want to find connection for')
+parser.add_argument('--crawl', type=str, default=False, help='set to True if you want recollect connection, \
+                    False if you want to use file specified by --connection')
+parser.add_argument('--connection', type=str, default='connections.json', help='the connection collected by this program, \
+                    it should be a dict of dict saved in json format, first key being institution name, second key being \
+                    faculty member name')
 args = parser.parse_args()
 
 def univ_collection(target_alias=None):
@@ -75,13 +81,19 @@ def compute_frequency(connections, top_k=10):
             connections[univ][member] = util.process_institutions(connections[univ][member])
             for institute in connections[univ][member]:
                 count[institute] += 1
-        counts[univ] = sorted(count.items(), key=lambda x: x[1], reverse=True)
+        counts[univ] = dict(sorted(count.items(), key=lambda x: x[1], reverse=True))
     with open('counts.json', 'w') as cnt:
         json.dump(dict(counts), cnt)
     return counts
 
 if __name__ == '__main__':
     target_alias = args.range
-    univ_faculty_collection = univ_collection(target_alias)
-    connection = find_connections(univ_faculty_collection)
-    count = compute_frequency(connection)
+    if literal_eval(args.crawl):
+        print('-----begin to recollect connection------')
+        univ_faculty_collection = univ_collection(target_alias)
+        connection = find_connections(univ_faculty_collection)
+        count = compute_frequency(connection)
+    else:
+        print('-----begin to recount connection-----')
+        connection = util.load_data(args.connection)
+        count = compute_frequency(connection)

@@ -1,22 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import json
+import json, re
 from collections import defaultdict
 from itertools import cycle
+import util
 
 color_cycle = cycle('bgrcmk')
-
-def load_data(filename):
-    '''
-    this function will load the json file saved by main.py, return it as a dictionary
-    params:
-        filename: str, the path to file
-    return value:
-        a dict derived from the json file
-    '''
-    with open(filename, 'r') as f:
-        ret = json.load(f)
-    return ret
 
 def compute_total_connection(connections):
     '''
@@ -62,8 +51,8 @@ def compute_inner_connection(counts, t_avg_cons):
     '''
     for univ in counts:
         for ins in counts[univ]:    # ins: [institution_name, #connection]
-            if ins[0].replace(' ', '').lower() == univ.replace(' ', '').lower():
-                t_avg_cons[univ]['inner'] += ins[1] / t_avg_cons[univ]['total']
+            if re.sub('[^a-zA-Z -]', '', ins).lower() == re.sub('[^a-zA-Z -]', '', univ).lower():
+                t_avg_cons[univ]['inner'] += counts[univ][ins] / t_avg_cons[univ]['total']
         t_avg_cons[univ]['unique'] = len(counts[univ])
     return t_avg_cons
 
@@ -83,26 +72,27 @@ def plot_field(stat):
     plt.ylabel('connected')
     plt.xlim(-1.2, 1.2)
     plt.ylim(-1.2, 1.2)
-    # plt.ylim(100, 400)
-    total, inner, unique = [], [], []
+    total, inner, unique, avg = [], [], [], []
     for univ in stat:
         total.append(stat[univ]['total'])
         inner.append(1-stat[univ]['inner'])
         unique.append(stat[univ]['unique'])
-    total, inner, unique = np.array(total), np.array(inner), np.array(unique)
+        avg.append(stat[univ]['avg'])
+    total, inner, unique, avg = np.array(total), np.array(inner), np.array(unique), np.array(avg)
     epsilon = 2e-8  # avoid divided by 0
-    total = 2 * (total-total.min()) / (total.max()-total.min()+epsilon) - 1
-    inner = 2 * (inner-inner.min()) / (inner.max()-inner.min()+epsilon) - 1
+    avg = util.normal_to_m1p1(avg)
+    inner = util.normal_to_m1p1(inner)
+    unique = util.normal_to_01(unique) + 1
     offset1, offset2, idx = 7.5e-3, 6e-3, 0
     for univ in stat:
-        plt.scatter(inner[idx], total[idx], s=unique[idx]*20, c=next(color_cycle), alpha=.6)
-        plt.annotate(univ, (inner[idx], total[idx]), (inner[idx]-offset1*len(univ), total[idx]+offset2*len(univ)))
+        plt.scatter(inner[idx], avg[idx], s=unique[idx]*200, c=next(color_cycle), alpha=.6)
+        plt.annotate(univ, (inner[idx], avg[idx]), (inner[idx]-offset1*len(univ), avg[idx]+offset2*len(univ)))
         idx += 1
     plt.show()
 
 def show():
-    con = load_data('connections.json')
-    cnt = load_data('counts.json')
+    con = util.load_data('connections.json')
+    cnt = util.load_data('counts.json')
     t_avg = compute_total_connection(con)
     stat = compute_inner_connection(cnt, t_avg)
     plot_field(stat)

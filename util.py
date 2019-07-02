@@ -8,17 +8,27 @@ from bs4 import BeautifulSoup
 import random, re, time
 random.seed(9102)
 
+def load_data(filename):
+    '''
+    this function will load the json file saved by main.py, return it as a dictionary
+    params:
+        filename: str, the path to file
+    return value:
+        a dict derived from the json file
+    '''
+    with open(filename, 'r') as f:
+        ret = json.load(f)
+    return ret
+
 # pretend to browse with some browsers on some platform (shamelessly)
-with open('user-agent.json', 'r') as ug:
-    headers = json.load(ug)
+headers = load_data('user-agent.json')
 
 # FIXME proxy to access Google services, change this according to your config
 socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:pass@localhost:1080')
 
 # read all alternative google sites provided by search.json
 # search with them randomly to avoid being blocked by google (shamelessly +1)
-with open('search.json', 'r') as googles:
-    google_sites = json.load(googles)
+google_sites = load_data('search.json')
 
 # rules for parsing google scholar list
 interested_parties = {'composite': ['university', 'academy', 'institute'],
@@ -211,7 +221,7 @@ def process_institutions(raw_list):
                         # replace "&" with "and"
                         entity = entity.replace('&', 'and')
                         # replace other punctuations, preserving only alphabet, digit, and white space
-                        entity = re.sub(r'[^a-zA-z0-9 ]', '', entity)
+                        entity = re.sub(r'[^a-zA-z0-9 -]', '', entity)
                         processed_list.append(entity if ins!='single' else party)
                         break   # we will assume that each person is affiliated with only one institution
                 if found:
@@ -219,3 +229,23 @@ def process_institutions(raw_list):
             if found:
                 break
     return processed_list
+
+def normal_to_01(arr):
+    '''
+    this function normalize a sequence of data to range [0, 1]
+    params:
+        arr: 1d numpy array
+    return value:
+        numpy array of same length, with data normalized to range [0, 1]
+    '''
+    return (arr-arr.min()) / (arr.max()-arr.min())
+
+def normal_to_m1p1(arr):
+    '''
+    this function normalize a sequence of data to range [-1, 1]
+    params:
+        arr: 1d numpy array
+    return value:
+        numpy array of same length, with data normalized to range [-1, 1]
+    '''
+    return 2 * (arr-arr.min()) / (arr.max()-arr.min()) - 1
