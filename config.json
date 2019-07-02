@@ -1,5 +1,17 @@
 [
     {
+        "university": "Peking University",
+        "url": "http://eecs.pku.edu.cn/szdw1/zzjs1.htm",
+        "xpath": "//ul[@class='zzjs1M2']/li[position()>6 and position()<12]/div/p/a/text()",
+        "alias": "pku"
+    },
+    {
+        "university": "Tsinghua University",
+        "url": "http://www.cs.tsinghua.edu.cn/publish/cs/4797/index.html",
+        "xpath": "//ul[@class=' list-paddingleft-2' and position()<6]/li[position()<4]/p/a/text()",
+        "alias": "thu"
+    },
+    {
         "university": "Nanjing University",
         "url": "http://cs.nju.edu.cn/1651/list.htm",
         "xpath": "//div[position()<4][@id='wp_news_w82']/ul/li/table/tr/td/ul/li/div/span/a/text()",

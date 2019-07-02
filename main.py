@@ -2,19 +2,26 @@ import util
 import json
 from collections import defaultdict
 import time
+import argparse
 
-def univ_collection():
+parser = argparse.ArgumentParser(description="collection connections and save to json")
+parser.add_argument('--range', type=str, default=None, help='the institutions you want to find connection for')
+args = parser.parse_args()
+
+def univ_collection(target_alias=None):
     '''
     this function use api defined in util.py, collect faculty lists of universities provided in config.json
     and covert the Chinese to name represent by pinyin followed by the full name of this university
     params:
-        None
+        target_alias: str, list of str, or None. the institutions we would like to find connection for, if set to None
+        find for all institutions supported by config.json
     return value:
         defaultdict, each key is the university's name, and the value is a list of all faculty members' pinyin names
         with this alias
     '''
     configs = util.read_config()
-    univ_faculty_collection = util.crawl_faculty_list(configs)
+    print('find connection for {}'.format(target_alias if target_alias else 'all'))
+    univ_faculty_collection = util.crawl_faculty_list(configs, target_alias)
     univ_faculty_collection = util.extract_name(univ_faculty_collection)
     univ_faculty_collection = util.name_to_pinyin(univ_faculty_collection)
     return univ_faculty_collection
@@ -38,7 +45,8 @@ def find_connections(univ_faculty_collection):
             if scholar_page:
                 # time.sleep(random.randint(0, 1)) -> it appears that crawling google scholar user page is permitted
                 connection = util.parse_scholar(scholar_page)
-                connection = util.process_institutions(connection)
+                # save the following line for compute_frequency
+                # connection = util.process_institutions(connection) 
                 if connection:
                     connection_dict[member] = connection
         connections[univ] = connection_dict
@@ -64,6 +72,7 @@ def compute_frequency(connections, top_k=10):
     for univ in connections:
         count = defaultdict(int)
         for member in connections[univ]:
+            connections[univ][member] = util.process_institutions(connections[univ][member])
             for institute in connections[univ][member]:
                 count[institute] += 1
         counts[univ] = sorted(count.items(), key=lambda x: x[1], reverse=True)
@@ -72,6 +81,7 @@ def compute_frequency(connections, top_k=10):
     return counts
 
 if __name__ == '__main__':
-    univ_faculty_collection = univ_collection()
+    target_alias = args.range
+    univ_faculty_collection = univ_collection(target_alias)
     connection = find_connections(univ_faculty_collection)
     count = compute_frequency(connection)

@@ -5,8 +5,7 @@ from pypinyin import lazy_pinyin
 import requests
 from lxml import etree
 from bs4 import BeautifulSoup
-import random
-import re
+import random, re, time
 random.seed(9102)
 
 # pretend to browse with some browsers on some platform (shamelessly)
@@ -54,14 +53,23 @@ def crawl_faculty_list(configs, target_alias=None):
     '''
     university_faculty = defaultdict(list)
     for univ in configs:
+        s_start = time.time()
         if target_alias is not None and univ['alias'] not in target_alias:
             continue
-        header = random.choice(headers)
-        req = requests.get(univ['url'], headers=header)
-        req.encoding = 'gbk' if req.apparent_encoding=='GB2312' else req.apparent_encoding
-        text = req.text
-        tree = etree.HTML(text)
-        university_faculty[univ['university']] = tree.xpath(univ['xpath'])
+        while True:
+            header = random.choice(headers)
+            req = requests.get(univ['url'], headers=header)
+            # gb2312 fails to encode some rare characters, so we change it to gbk
+            req.encoding = 'gbk' if req.apparent_encoding=='GB2312' else req.apparent_encoding
+            text = req.text
+            tree = etree.HTML(text)
+            name_list = tree.xpath(univ['xpath'])
+            if name_list:
+                university_faculty[univ['university']] = name_list
+                print("-----finish faculty collection for {} after {:.3} sec------".format(univ['university'], \
+                                                                                    time.time()-s_start))
+                s_start = time.time()
+                break
     return university_faculty
 
 def extract_name(raw_dict):
@@ -80,9 +88,7 @@ def extract_name(raw_dict):
                 name = char_list[0]
             else:
                 name = raw_dict[univ][idx]
-            name = name.replace(u'\u3000', u' ')
-            name = name.replace(u'\xa0', u'')
-            name = name.replace(' ', '')
+            name = name.replace(u'\u3000', u'').replace(u'\xa0', u'').replace(' ', '')
             name = name.split('(')[0].split('（')[0]
             raw_dict[univ][idx] = name
     return raw_dict
@@ -184,7 +190,11 @@ def process_institutions(raw_list):
         return processed_list
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
-        entities = raw_list[idx].lower().split(', ')
+        entities = raw_list[idx].lower().split(',')
+        sep = []
+        for entity in entities:
+            sep += entity.split('/')
+        entities = sep
         # only look for universities and a few companies now
         found = False
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful

@@ -40,7 +40,7 @@ def compute_total_connection(connections):
             cnt += len(connections[univ][member])
         t_avg_con = defaultdict(float)
         t_avg_con['total'] = cnt
-        t_avg_con['avg'] = cnt/len(connections[univ])
+        t_avg_con['avg'] = cnt / len(connections[univ])
         t_avg_cons[univ] = t_avg_con
     return t_avg_cons
 
@@ -61,10 +61,10 @@ def compute_inner_connection(counts, t_avg_cons):
             avg per member, ratio of inner connections
     '''
     for univ in counts:
-        for ins in counts[univ]:
-            if ins[0].replace(' ', '') == univ.replace(' ', '').lower():
+        for ins in counts[univ]:    # ins: [institution_name, #connection]
+            if ins[0].replace(' ', '').lower() == univ.replace(' ', '').lower():
                 t_avg_cons[univ]['inner'] += ins[1] / t_avg_cons[univ]['total']
-                t_avg_cons[univ]['unique'] += len(counts[univ])
+        t_avg_cons[univ]['unique'] = len(counts[univ])
     return t_avg_cons
 
 def plot_field(stat):
@@ -80,17 +80,25 @@ def plot_field(stat):
     '''
     plt.figure(figsize=(14, 10))
     plt.xlabel('collaborated')
-    plt.xlim(0.71, .9)
     plt.ylabel('connected')
-    plt.ylim(100, 400)
+    plt.xlim(-1.2, 1.2)
+    plt.ylim(-1.2, 1.2)
+    # plt.ylim(100, 400)
+    total, inner, unique = [], [], []
     for univ in stat:
-        plt.scatter(1-stat[univ]['inner'], stat[univ]['unique'], \
-                    s=stat[univ]['total']*10, c=next(color_cycle), alpha=.7)
-        if 'Technology' in univ:
-            plt.annotate(univ, (1-stat[univ]['inner'], stat[univ]['unique']), (1-stat[univ]['inner']-.025, stat[univ]['unique']+20))
-        else:
-            plt.annotate(univ, (1-stat[univ]['inner'], stat[univ]['unique']), (1-stat[univ]['inner']-.01, stat[univ]['unique']+20))
-    plt.savefig('result.png')
+        total.append(stat[univ]['total'])
+        inner.append(1-stat[univ]['inner'])
+        unique.append(stat[univ]['unique'])
+    total, inner, unique = np.array(total), np.array(inner), np.array(unique)
+    epsilon = 2e-8  # avoid divided by 0
+    total = 2 * (total-total.min()) / (total.max()-total.min()+epsilon) - 1
+    inner = 2 * (inner-inner.min()) / (inner.max()-inner.min()+epsilon) - 1
+    offset1, offset2, idx = 7.5e-3, 6e-3, 0
+    for univ in stat:
+        plt.scatter(inner[idx], total[idx], s=unique[idx]*20, c=next(color_cycle), alpha=.6)
+        plt.annotate(univ, (inner[idx], total[idx]), (inner[idx]-offset1*len(univ), total[idx]+offset2*len(univ)))
+        idx += 1
+    plt.show()
 
 def show():
     con = load_data('connections.json')
@@ -98,3 +106,6 @@ def show():
     t_avg = compute_total_connection(con)
     stat = compute_inner_connection(cnt, t_avg)
     plot_field(stat)
+
+if __name__=="__main__":
+    show()
