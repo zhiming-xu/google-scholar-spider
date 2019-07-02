@@ -10,5 +10,9 @@
     {"region": "thailand", "url":"https://www.google.co.th/search?&q="},
     {"region": "australia", "url":"https://www.google.com.au/search?&q="},
     {"region": "united kingdom", "url":"https://www.google.co.uk/search?&q="},
-    {"region": "indonesia", "url":"https://www.google.co.id/search?&q="}
+    {"region": "indonesia", "url":"https://www.google.co.id/search?&q="},
+    {"region": "israel", "url": "https://www.google.co.il/search?&q="},
+    {"region": "new zealand", "url": "https://www.google.co.nz/search?&q="},
+    {"region": "taiwan", "url": "https://www.google.com.tw/search?&q="},
+    {"region": "united states virgin islands", "url": "https://www.google.co.vi/search?&q="}
 ]

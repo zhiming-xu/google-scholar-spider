@@ -7,7 +7,7 @@ from ast import literal_eval
 
 parser = argparse.ArgumentParser(description="collection connections and save to json")
 parser.add_argument('--range', type=str, default=None, help='the institutions you want to find connection for')
-parser.add_argument('--crawl', type=str, default=False, help='set to True if you want recollect connection, \
+parser.add_argument('--crawl', type=str, default='False', help='set to True if you want recollect connection, \
                     False if you want to use file specified by --connection')
 parser.add_argument('--connection', type=str, default='connections.json', help='the connection collected by this program, \
                     it should be a dict of dict saved in json format, first key being institution name, second key being \

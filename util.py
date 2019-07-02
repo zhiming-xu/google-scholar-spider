@@ -200,11 +200,13 @@ def process_institutions(raw_list):
         return processed_list
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
-        entities = raw_list[idx].lower().split(',')
-        sep = []
-        for entity in entities:
-            sep += entity.split('/')
-        entities = sep
+        delimiters = [',', '/', ';']
+        entities = [raw_list[idx].lower()]
+        for delimiter in delimiters:
+            sep = []
+            for entity in entities:
+                sep += entity.split(delimiter)
+            entities = sep
         # only look for universities and a few companies now
         found = False
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
@@ -219,7 +221,7 @@ def process_institutions(raw_list):
                         while entity and entity[-1].isalpha() is False:
                             entity = entity[:-1]
                         # replace "&" with "and"
-                        entity = entity.replace('&', 'and')
+                        entity = entity.replace('&', 'and').replace('at ', '')
                         # replace other punctuations, preserving only alphabet, digit, and white space
                         entity = re.sub(r'[^a-zA-z0-9 -]', '', entity)
                         processed_list.append(entity if ins!='single' else party)
