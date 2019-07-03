@@ -224,7 +224,7 @@ def process_institutions(raw_list):
                         # replace "&" with "and"
                         entity = entity.replace(' & ', ' and ').replace('at ', '')
                         # replace other punctuations, preserving only alphabet, digit, and white space
-                        entity = re.sub(r'[^a-zA-z0-9 -]', '', entity)
+                        entity = re.sub(r"[^a-zA-z0-9 -']", '', entity)
                         processed_list.append(entity if ins!='single' else party)
                         break   # we will assume that each person is affiliated with only one institution
                 if found:

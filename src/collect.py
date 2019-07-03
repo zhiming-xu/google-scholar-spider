@@ -61,40 +61,12 @@ def find_connections(univ_faculty_collection):
         json.dump(dict(connections), con)
     return connections
 
-def compute_frequency(connections, top_k=10):
-    '''
-    this function counts the connections, each institute's each occurrance counts for once
-    params:
-        connections: returned by find_connections
-        defaultdict of defaultdict, key: university name, value: defaultdict, 
-                                    secondary key: faculty member's name, secondary value: list of cooperating institutions 
-        top_k: int, count the first top_k connections of a faculty member, default to 10, same as that in util.parse_scholar
-    return value:
-        count: defaultdict of defaultdict, key: university name, value: defaultdict,
-                                           secondary key: institute's name, secondary key: number of occurrance
-    '''
-    counts = defaultdict(defaultdict)
-    for univ in connections:
-        count = defaultdict(int)
-        for member in connections[univ]:
-            connections[univ][member] = util.process_institutions(connections[univ][member])
-            # some faculty member might have no connection on google scholar
-            if connections[univ][member]:
-                for institute in connections[univ][member]:
-                    count[institute] += 1
-        counts[univ] = dict(sorted(count.items(), key=lambda x: x[1], reverse=True))
-    with open('counts.json', 'w') as cnt:
-        json.dump(dict(counts), cnt)
-    return counts
-
 if __name__ == '__main__':
     target_alias = args.range
     if literal_eval(args.crawl):
         print('-----begin to recollect connection------')
         univ_faculty_collection = univ_collection(target_alias)
         connection = find_connections(univ_faculty_collection)
-        count = compute_frequency(connection)
     else:
         print('-----begin to recount connection-----')
         connection = util.load_data(args.connection)
-        count = compute_frequency(connection)

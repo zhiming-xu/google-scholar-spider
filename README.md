@@ -26,7 +26,7 @@ I have tested with the following config
 - [`pypinyin==0.33.2`](https://github.com/mozillazg/python-pinyin), converting Chinese characters to corresponding pinyin
 ### Command (Under development)
 #### Data collection module
-- `main.py` can accept the following parameters
+- `collect.py` can accept the following parameters
 ```
 $ python3 collect.py [-h] [--range RANGE] [--crawl CRAWL] [--connection CONNECTION]
 optional arguments:
