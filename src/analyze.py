@@ -116,10 +116,11 @@ def plot_field(stat):
         # ax.annotate(univ, (x_axis[idx],y_axis[idx], z_axis[idx]), (x_axis[idx], y_axis[idx], z_axis[idx]))
         idx += 1
     plt.savefig('../result/demo.png')
+    plt.show()
 
 def compute_stat():
-    con = util.load_data('connections.json')
-    cnt = util.load_data('counts.json')
+    con = util.load_data('../result/connections.json')
+    cnt = util.load_data('../result/counts.json')
     stat = defaultdict(defaultdict)
     stat = compute_member_w_connection(con, stat)
     stat = compute_total_connection(con, stat)
@@ -129,5 +130,5 @@ def compute_stat():
 if __name__=="__main__":
     stat = compute_stat()
     df_stat = pd.DataFrame.from_dict(stat, 'index')
-    df_stat.to_csv('stat.csv')
+    df_stat.to_csv('../result/stat.csv')
     plot_field(stat)
