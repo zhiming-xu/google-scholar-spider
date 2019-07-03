@@ -24,10 +24,14 @@ I have tested with the following config
 - `beautifulsoup4==4.6.3`, parsing HTML response
 - [`pypinyin==0.33.2`](https://github.com/mozillazg/python-pinyin), converting Chinese characters to corresponding pinyin
 ### Command (Under development)
-Run the following command in shell.
-
+- The [data collection](main.py), `main.py` can accept the following parameters
 ```
-$ python3 main.py
+$ python3 main.py [-h] [--range RANGE] [--crawl CRAWL] [--connection CONNECTION]
+optional arguments:
+    -h, --help,         show the help message and exit
+    --range RANGE,      the institution(s) you want to collect connection for, e.g., if you would like to find for Tsinghua University
+                        and Peking University, this should be set to their alias: 'thu pku'. Default to 'all', i.e., find for all
+                        institutions supported by [institution.json](config/institution.json)
 ```
 
 Then the two file described above will be generated.
