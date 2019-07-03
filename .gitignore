@@ -1,6 +1,5 @@
 # produced result -> run on your own;)
-connections.json
-counts.json
+result/
 
 # model file
 model/

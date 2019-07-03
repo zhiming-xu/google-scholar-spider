@@ -115,7 +115,7 @@ def plot_field(stat):
         ax.scatter(x_axis[idx], y_axis[idx], z_axis[idx], s=area[idx]*2000, c=next(color_cycle), marker='o', alpha=.6)
         # ax.annotate(univ, (x_axis[idx],y_axis[idx], z_axis[idx]), (x_axis[idx], y_axis[idx], z_axis[idx]))
         idx += 1
-    plt.show()
+    plt.savefig('../result/demo.png')
 
 def compute_stat():
     con = util.load_data('connections.json')
