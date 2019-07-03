@@ -6,6 +6,7 @@ import requests
 from lxml import etree
 from bs4 import BeautifulSoup
 import random, re, time
+import numpy as np
 random.seed(9102)
 
 def load_data(filename):
@@ -196,7 +197,7 @@ def process_institutions(raw_list):
         a list of the same length, each corresponding entry contains only the name of a coauthor's institution
     '''
     processed_list = []
-    if raw_list == None:
+    if raw_list is None or raw_list == []:
         return processed_list
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
@@ -221,7 +222,7 @@ def process_institutions(raw_list):
                         while entity and entity[-1].isalpha() is False:
                             entity = entity[:-1]
                         # replace "&" with "and"
-                        entity = entity.replace('&', 'and').replace('at ', '')
+                        entity = entity.replace(' & ', ' and ').replace('at ', '')
                         # replace other punctuations, preserving only alphabet, digit, and white space
                         entity = re.sub(r'[^a-zA-z0-9 -]', '', entity)
                         processed_list.append(entity if ins!='single' else party)
@@ -240,7 +241,7 @@ def normal_to_01(arr):
     return value:
         numpy array of same length, with data normalized to range [0, 1]
     '''
-    return (arr-arr.min()) / (arr.max()-arr.min())
+    return (arr-arr.min()) / (arr.max()-arr.min() + np.finfo('float').eps)
 
 def normal_to_m1p1(arr):
     '''
@@ -250,4 +251,4 @@ def normal_to_m1p1(arr):
     return value:
         numpy array of same length, with data normalized to range [-1, 1]
     '''
-    return 2 * (arr-arr.min()) / (arr.max()-arr.min()) - 1
+    return 2 * (arr-arr.min()) / (arr.max()-arr.min() + np.finfo('float').eps) - 1

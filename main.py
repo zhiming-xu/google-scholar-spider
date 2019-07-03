@@ -52,9 +52,8 @@ def find_connections(univ_faculty_collection):
                 # time.sleep(random.randint(0, 1)) -> it appears that crawling google scholar user page is permitted
                 connection = util.parse_scholar(scholar_page)
                 # save the following line for compute_frequency
-                # connection = util.process_institutions(connection) 
-                if connection:
-                    connection_dict[member] = connection
+                # we should be careful now since this could be empty
+                connection_dict[member] = connection
         connections[univ] = connection_dict
         print('-----finish connection finding for {} after {:.5} sec-----'.format(univ, time.time()-s_time))
         s_time = time.time()
@@ -79,8 +78,10 @@ def compute_frequency(connections, top_k=10):
         count = defaultdict(int)
         for member in connections[univ]:
             connections[univ][member] = util.process_institutions(connections[univ][member])
-            for institute in connections[univ][member]:
-                count[institute] += 1
+            # some faculty member might have no connection on google scholar
+            if connections[univ][member]:
+                for institute in connections[univ][member]:
+                    count[institute] += 1
         counts[univ] = dict(sorted(count.items(), key=lambda x: x[1], reverse=True))
     with open('counts.json', 'w') as cnt:
         json.dump(dict(counts), cnt)
