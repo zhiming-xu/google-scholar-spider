@@ -10,11 +10,13 @@ This is a connection figure demonstrating collected data. The x-axis shows the r
 ![demo](result/demo-2d.png)
 ## Introduction
 ### Pipeline
-- Acquire the faculty members' (Full Professor, Associate/Assistant Professor, and Lecturer, depending on different institutions
+- Acquire the faculty members' (Full Professor, Associate/Assistant Professor, and Lecturer, depending on different institutions,
   this could be a little different) names of all target institutions given in [`institutions.json`](config/institutions.json).
-- Search Google for all faculty members' names, acquire their Google Scholar homepage.
-- Extract their coauthors affiliated institutions, save as a json file to `connections.json`.
-- Count the numbers of occurrences of cooperated institutions of target institutions, sorted from most frequent to most rare, save it as a json file named `counts.json`.
+- Search Google for all these names, find their Google Scholar homepage.
+- Extract their coauthors affiliated institutions, save in json format ass `connections.json`.
+- Count the numbers of occurrences of cooperated institutions of target institutions, sorted from most frequent to most rare, save it in json format as `counts.json`.
+- Compute more statistical features with [`feature.py`](src/feature.py)
+- Visualize statistical features with [`vis.py`](src/vis.py)
 
 ## Usage
 ### Requirements
