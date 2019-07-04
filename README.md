@@ -9,8 +9,6 @@ mistakes. They are discussed in the following [Known Issues](#Known-Issues) part
 This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions other than the target institution. The y-axis shows the average number of unique collaborated institution per faculty member has. The relative size of each circle represents the total times of occurrences of all different institutions with which a certain institution has collaborated with.
 ![demo](result/demo.png)
 ## Introduction
-### Intuition
-TODO
 ### Pipeline
 - Acquire the faculty members' (Full Professor, Associate/Assistant Professor, and Lecturer, depending on different institutions
   this could be a little different) names of all target institutions given in [`institutions.json`](config/institutions.json).
@@ -24,11 +22,14 @@ I have tested with the following config
 - `requests==2.22.0`, request webpage
 - `beautifulsoup4==4.6.3`, parsing HTML response
 - [`pypinyin==0.33.2`](https://github.com/mozillazg/python-pinyin), converting Chinese characters to corresponding pinyin
-### Command (Under development)
-#### Data collection module
+### Command (Initial full release)
+#### Data collecting module
 - `collect.py` can accept the following parameters
 ```
 $ python3 collect.py [-h] [--range RANGE] [--crawl CRAWL] [--connection CONNECTION]
+
+collection connections and save in json format
+
 optional arguments:
     -h, --help,         show help message and exit
     --range RANGE,      the institution(s) you want to collect connection for,
@@ -47,11 +48,47 @@ optional arguments:
                         default to `result/connections.json`
 ```
 
-#### Data analysis module
-- `analyze.py` can accept the following parameters
+#### Statistics computing module
+- `feature.py` can accept the following parameters
 ```
-$ python3 analyze.py
+$ python3 analyze.py [-h] [--connection CONNECTION] [--count COUNT]
+                     [--top_k TOP_K] [--min_occur MIN_OCCUR]
+
+generate statistics and save them to a csv with collected data
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --connection CONNECTION
+                        path to load the the connections file collected by
+                        this program
+  --count COUNT         path to load the the counts file collected by this
+                        program, if set None, recompute the counts
+  --top_k TOP_K         if recompute counts, take how many researchers a
+                        faculty member connects to into account
+  --min_occur MIN_OCCUR
+                        if recompute counts, take only institution show up
+                        more than min_occur times into account
 ```
+
+#### Visualization module
+- `vis.py` can accept the following parameters
+```
+$python3 vis.py [-h] [--stat STAT] [--plot_type PLOT_TYPE] [--fields FIELDS]
+                [--area AREA]
+
+provide visualization for statistics saved in the csv file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --stat STAT           path to the csv file saved by feature.py
+  --plot_type PLOT_TYPE
+                        choose visualization for data, 2 for 2d plots, 3 for
+                        3d ones
+  --fields FIELDS       choose which fields in statistics to generate plot,
+                        the order is "data_x_dim data_y_dim" for 2d plots and
+                        "data_x_dim data_y_dim data_z_dim" for 3d ones
+  --area AREA           choose the meaning of each dot
+```  
 
 ### Note
 - The searching and parsing process involves visiting Google websites and services. If these resources are not directly accessible from your area, you might need to come up with some way to break out of such restriction.

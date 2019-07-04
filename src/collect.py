@@ -5,7 +5,7 @@ import time
 import argparse
 from ast import literal_eval
 
-parser = argparse.ArgumentParser(description="collection connections and save to json")
+parser = argparse.ArgumentParser(description="collection connections and save in json format")
 parser.add_argument('--range', type=str, default=None, help='the institutions you want to find connection for')
 parser.add_argument('--crawl', type=str, default='False', help='set to True if you want recollect connection, \
                     False if you want to use file specified by --connection')

@@ -1,14 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import json, re
 from collections import defaultdict
-from itertools import cycle
 import util
 import pandas as pd
-from mpl_toolkits.mplot3d import Axes3D
 import argparse
 
-parser = argparse.ArgumentParser(description="analyze the collected data, generate statistics and provide visualization")
+parser = argparse.ArgumentParser(description="generate statistics and save them to a csv with collected data")
+
 parser.add_argument('--connection', type=str, default='../result/connections.json', help= \
                     'path to load the the connections file collected by this program')
 parser.add_argument('--count', type=str, default='../result/counts.json', help= \
@@ -17,15 +15,8 @@ parser.add_argument('--top_k', type=int, default=10, help='if recompute counts, 
                     member connects to into account')
 parser.add_argument('--min_occur', type=int, default=1, help='if recompute counts, take only institution show up more \
                     than min_occur times into account')
-'''
-parser.add_argument('--plot_type', type=int, default=2, help='choose visualization for data, 2 for 2d plots, 3 for 3d ones')
-parser.add_argument('--field', type=str, default='inner_connection_ratio avg_per_member_w_connection', help='choose \
-                    which fields in statistics to generate plot, the order is "data_x_dim data_y_dim" for 2d plots and \
-                    "data_x_dim data_y_dim data_z_dim" for 3d ones')
-'''
-args = parser.parse_args()
 
-color_cycle = cycle('bgrcmky')
+args = parser.parse_args()
 
 def compute_frequency(connections, top_k, min_occur):
     '''
@@ -107,51 +98,31 @@ def compute_connection_stats(counts, stat):
             stat[univ]['total_connections'] += counts[univ][ins]
         stat[univ]['inner_connection_ratio'] /= stat[univ]['total_connections']
         stat[univ]['unique_connections'] = len(counts[univ])
-        stat[univ]['avg_connection_per_member'] = stat[univ]['unique_connections'] / stat[univ]['#total_member']
-        stat[univ]['avg_per_member_w_connection'] = stat[univ]['unique_connections'] / stat[univ]['#member_w_connection']
-        stat[univ]['avg_collaborator_per_member'] = stat[univ]['total_connections'] / stat[univ]['#member_w_connection']
+        stat[univ]['avg_coauthors_per_member'] = stat[univ]['total_connections'] / stat[univ]['#total_member']
+        stat[univ]['avg_coauthors_per_w_con'] = stat[univ]['total_connections'] / stat[univ]['#member_w_connection']
+        stat[univ]['avg_connection_per_member'] = stat[univ]['unique_connections'] / stat[univ]['#member_w_connection']
     return stat
 
-def plot_field_3d(stat):
-    '''
-    this function will visualize the data we collect, with x-axis being outer connection ratio,
-    and y-axis being number of unique_connections connections, size of plot being total_connections connections
-    params:
-        stat: dict of dict
-            key: institution name, value: dict
-            secondary key: 'total_connections', 'num_members', 'inner_connection_ratio', 'unique_connections'
-    return value:
-        none
-    '''
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('outreaching')
-    ax.set_ylabel('connecting')
-    ax.set_zlabel('collaborating')
-    ax.set_xlim(-.2, 1.2)
-    ax.set_ylim(-.2, 1.2)
-    ax.set_zlim(-.2, 1.2)
-    x_axis, y_axis, z_axis, area = [], [], [], []
-    for univ in stat:
-        x_axis.append(1-stat[univ]['inner_connection_ratio'])
-        y_axis.append(stat[univ]['avg_per_member_w_connection'])
-        z_axis.append(stat[univ]['avg_collaborator_per_member'])
-        area.append(stat[univ]['#total_member'])
-    x_axis, y_axis, z_axis, area = np.array(x_axis), np.array(y_axis), np.array(z_axis), np.array(area)
-    x_axis = util.normal_to_01(x_axis)
-    y_axis = util.normal_to_01(y_axis)
-    z_axis = util.normal_to_01(z_axis)
-    area = util.normal_to_01(area) + 1
-    offset1, offset2, idx = 7.5e-3, 1.5e-1, 0
-    for univ in stat:
-        ax.scatter(x_axis[idx], y_axis[idx], z_axis[idx], s=area[idx]*2000, c=next(color_cycle), marker='o', alpha=.6)
-        # ax.annotate(univ, (x_axis[idx],y_axis[idx], z_axis[idx]), (x_axis[idx], y_axis[idx], z_axis[idx]))
-        idx += 1
-    # print(x_axis, y_axis, z_axis)
-    plt.savefig('../result/demo.png')
-
 def compute_stat():
-    con = util.load_data('../result/connections.json')
+    '''
+    this function will compute the statistics from connections.json and counts.json
+    params:
+        None
+    return value:
+        the computed statistics, for each institution, the following fields are generated:
+        #total_member: number of total faculty members crawled from official websites
+        #member_w_connection: number of total faculty members that have connection on google scholar
+        total_connections: number of collaborated institutions' occurrences (w/ duplicates) shown on google scholar
+        inner_connection_ratio: ratio of colloborations from the same institution
+        unique_connections: number of different collaborated institutions
+        avg_coauthors_per_member: total_connections / #total_member
+        avg_coauthors_per_w_con: total_connections / #member_w_connection
+        avg_connection_per_member: unique_connection / #member_w_connection
+    '''
+    try:
+        con = util.load_data('../result/connections.json')
+    except:
+        print('no connection file find, please make sure it exists, if not, try to generate with collect.py')
     if args.count != 'None':
         cnt = util.load_data(args.count)
     else:
@@ -163,6 +134,6 @@ def compute_stat():
 
 if __name__=="__main__":
     stat = compute_stat()
-    df_stat = pd.DataFrame.from_dict(stat, 'index')
+    df_stat = pd.DataFrame.from_dict(stat, orient='index')
+    # save the statistics to a csv
     df_stat.to_csv('../result/stat.csv')
-    plot_field_3d(stat)
