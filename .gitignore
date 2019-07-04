@@ -1,6 +1,9 @@
 # produced result -> run on your own;)
 result/
 
+# for demo in readme
+!result/*.png
+
 # model file
 model/
 

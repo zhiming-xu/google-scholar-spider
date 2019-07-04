@@ -7,7 +7,7 @@ mistakes. They are discussed in the following [Known Issues](#Known-Issues) part
 
 ## Quick view
 This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions other than the target institution. The y-axis shows the average number of unique collaborated institution per faculty member has. The relative size of each circle represents the total times of occurrences of all different institutions with which a certain institution has collaborated with.
-![demo](result/demo.png)
+![demo](result/demo-2d.png)
 ## Introduction
 ### Pipeline
 - Acquire the faculty members' (Full Professor, Associate/Assistant Professor, and Lecturer, depending on different institutions
