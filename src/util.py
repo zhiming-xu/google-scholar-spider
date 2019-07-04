@@ -216,7 +216,7 @@ def process_institutions(raw_list):
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
         for entity in entities:
             # address institution name in chinese
-            entity = translator(entity, dest='en').text
+            # entity = translator(entity, dest='en').text
             for ins in interested_parties:
                 for party in interested_parties[ins]:
                     if party in entity:
