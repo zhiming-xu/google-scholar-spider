@@ -40,7 +40,7 @@ interested_parties = {'composite': ['university', 'academy', 'institute'],
                       'facebook', 'amazon', 'uber', 'intel', 'aws', 'apple', 'alibaba', 'baidu', \
                       'sensetime', 'face++', 'huawei', 'samsang', 'meituan', 'jd', 'didi']}
 
-def read_config(filename='config.json'):
+def read_config(filename='../config/institutions.json'):
     '''
     this function read configuration from config.json, which stores university name, url, xpath
     params:
@@ -216,7 +216,7 @@ def process_institutions(raw_list):
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
         for entity in entities:
             # address institution name in chinese
-            # entity = translator(entity, dest='en').text
+            entity = translator(entity, dest='en').text
             for ins in interested_parties:
                 for party in interested_parties[ins]:
                     if party in entity:
