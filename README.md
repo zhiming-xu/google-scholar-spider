@@ -6,7 +6,7 @@ attitude towards it. I modify nothing but make the data more readable and concis
 mistakes. They are discussed in the following [Known Issues](#Known-Issues) part and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that part as well as codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
 
 ## Quick view
-This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions other than the target institution. The y-axis shows the average number of unique collaborated institution per faculty member has. The relative size of each circle represents the total times of occurrences of all different institutions with which a certain institution has collaborated with.
+This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions that are the same to the target institution. The y-axis shows the average number of unique collaborated institution per faculty member has. The relative size of each circle represents the total number of faculty members that have connections.
 ![demo](result/demo-2d.png)
 ## Introduction
 ### Pipeline
