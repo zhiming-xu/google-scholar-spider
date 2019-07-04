@@ -7,6 +7,9 @@ from lxml import etree
 from bs4 import BeautifulSoup
 import random, re, time
 import numpy as np
+from googletrans import Translator
+
+translator = Translator(service_urls=['translate.google.cn'])
 random.seed(9102)
 
 def load_data(filename):
@@ -33,7 +36,7 @@ google_sites = load_data('../config/search.json')
 
 # rules for parsing google scholar list
 interested_parties = {'composite': ['university', 'academy', 'institute'],
-                      'single':  ['cas', 'hkust', 'eth', 'mit', 'tencent', 'microsoft', 'google', \
+                      'single':  ['cas', 'hkust', 'eth', 'mit', 'sustech', 'tencent', 'microsoft', 'google', \
                       'facebook', 'amazon', 'uber', 'intel', 'aws', 'apple', 'alibaba', 'baidu', \
                       'sensetime', 'face++', 'huawei', 'samsang', 'meituan', 'jd', 'didi']}
 
@@ -212,6 +215,8 @@ def process_institutions(raw_list):
         found = False
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
         for entity in entities:
+            # address institution name in chinese
+            entity = translator(entity, dest='en').text
             for ins in interested_parties:
                 for party in interested_parties[ins]:
                     if party in entity:

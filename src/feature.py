@@ -17,11 +17,12 @@ parser.add_argument('--top_k', type=int, default=10, help='if recompute counts, 
                     member connects to into account')
 parser.add_argument('--min_occur', type=int, default=1, help='if recompute counts, take only institution show up more \
                     than min_occur times into account')
+'''
 parser.add_argument('--plot_type', type=int, default=2, help='choose visualization for data, 2 for 2d plots, 3 for 3d ones')
 parser.add_argument('--field', type=str, default='inner_connection_ratio avg_per_member_w_connection', help='choose \
                     which fields in statistics to generate plot, the order is "data_x_dim data_y_dim" for 2d plots and \
                     "data_x_dim data_y_dim data_z_dim" for 3d ones')
-
+'''
 args = parser.parse_args()
 
 color_cycle = cycle('bgrcmky')
@@ -82,28 +83,6 @@ def compute_member_w_connection(connections, stat):
         stat[univ]['#member_w_connection'] = member_cnt
         stat[univ]['#total_member'] = len(connections[univ])
     return stat
-
-"""
-def compute_total_connection(counts, stat):
-    '''
-    this function computes the average connection per faculty member of a given institution
-    have. Note: since we set `top_k` for maximum number of google scholar coauthors, this
-    value might have a certain upper bound, you can change this by passing a specific top_k
-    to util.parse_scholar.
-    params:
-        connections: dict of dict, saved by main.find_connections,
-            key: institution name, value: dict, 
-            secondary key: faculty member's name, secondary value: list of cooperating institutions
-    return value:
-        dict:
-            key: institution name, value: dict
-            secondary key: 'total_connections': # of total_connections connections,
-            '#members': # of all faculty members
-    '''
-    for univ in counts:
-        stat[univ]['total_connections'] = len(connections[univ])
-    return stat
-"""
 
 def compute_connection_stats(counts, stat):
     '''
