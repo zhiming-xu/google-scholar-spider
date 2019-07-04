@@ -70,6 +70,7 @@ def crawl_faculty_list(configs, target_alias=None):
         s_start = time.time()
         if target_alias is not None and univ['alias'] not in target_alias:
             continue
+        retry_cnt = 10
         while True:
             header = random.choice(headers)
             req = requests.get(univ['url'], headers=header)
@@ -83,6 +84,10 @@ def crawl_faculty_list(configs, target_alias=None):
                 print("-----finish faculty collection for {} after {:.3} sec------".format(univ['university'], \
                                                                                     time.time()-s_start))
                 s_start = time.time()
+                break
+            retry_cnt -= 1
+            if retry_cnt == 0:
+                print('fail to find faculty for {} after 10 retries'.format(univ['university']))
                 break
     return university_faculty
 
