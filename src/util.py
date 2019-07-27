@@ -9,7 +9,7 @@ import random, re, time
 import numpy as np
 from googletrans import Translator
 
-translator = Translator(service_urls=['translate.google.cn'])
+translator = Translator(service_urls=['translate.google.com'])
 random.seed(9102)
 
 def load_data(filename):
@@ -26,9 +26,6 @@ def load_data(filename):
 
 # pretend to browse with some browsers on some platform (shamelessly)
 headers = load_data('../config/user-agent.json')
-
-# FIXME proxy to access Google services, change this according to your config
-socks5 = dict(http='socks5h://user:pass@localhost:1080', https='socks5h://user:pass@localhost:1080')
 
 # read all alternative google sites provided by search.json
 # search with them randomly to avoid being blocked by google (shamelessly +1)
@@ -155,11 +152,11 @@ def google_search(query):
     header = random.choice(headers)
     # FIXME: I have already found some mistakes made by googling like this, e.g., an irrelevant faculty found
     try:
-        page = requests.get(url=search_url, headers=header, proxies=socks5).text
+        page = requests.get(url=search_url, headers=header).text
     except:
         print('Error occurred when browsing with url {} in region {}'.format(url_prefix, region))
         if url_prefix != google_sites[0]:
-            page = requests.get(url=google_sites[0], headers=header, proxies=socks5).text
+            page = requests.get(url=google_sites[0], headers=header).text
         else:
             return None
     sp = BeautifulSoup(page, "html.parser")
@@ -186,7 +183,7 @@ def parse_scholar(url, top_k=10):
     '''
     header = random.choice(headers)
     try:
-        page = requests.get(url, headers=header, proxies=socks5).text
+        page = requests.get(url, headers=header).text
     except:
         print('Error occurred when browsing google scholar page at {}'.format(url))
         return None
@@ -210,6 +207,8 @@ def process_institutions(raw_list):
     for idx in range(len(raw_list)):
         # FIXME: the cases for handling troublesome punctuations are apparently non-exhausted, try to polish this part later
         delimiters = [',', '/', ';']
+        # some of the institution's name is in Chinese, translate to English
+        raw_list[idx] = translator.translate(raw_list[idx], src='zh-cn', dest='en').text
         entities = [raw_list[idx].lower()]
         for delimiter in delimiters:
             sep = []
