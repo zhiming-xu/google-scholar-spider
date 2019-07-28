@@ -6,14 +6,14 @@ attitude towards it. I modify nothing but make the data more readable and concis
 mistakes. They are discussed in the following [Known Issues](#Known-Issues) part and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that part as well as codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
 
 ## Quick view
-This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions other than the target institution. The y-axis shows the average number of unique collaborated institution per faculty member has. The relative size of each circle represents the total times of occurrences of all different institutions with which a certain institution has collaborated with.
+This is a connection figure demonstrating collected data. The x-axis shows the ratio of coauthors' affiliated institutions that are the same to the target institution. The y-axis shows the average number of unique collaborated institution per faculty member has. The relative size of each circle represents the total number of faculty members that have connections.
 ![demo](result/demo-2d.png)
 ## Introduction
 ### Pipeline
 - Acquire the faculty members' (Full Professor, Associate/Assistant Professor, and Lecturer, depending on different institutions,
   this could be a little different) names of all target institutions given in [`institutions.json`](config/institutions.json).
 - Search Google for all these names, find their Google Scholar homepage.
-- Extract their coauthors affiliated institutions, save in json format ass `connections.json`.
+- Extract their coauthors affiliated institutions, save in json format as `connections.json`.
 - Count the numbers of occurrences of cooperated institutions of target institutions, sorted from most frequent to most rare, save it in json format as `counts.json`.
 - Compute more statistical features with [`feature.py`](src/feature.py)
 - Visualize statistical features with [`vis.py`](src/vis.py)
@@ -108,4 +108,4 @@ In [`util.google_search`](src/util.py)
 - The query I use is of form `[given_name] [surname] [affiliated_institution]`, and I only look for the first hyperlink to a Google Scholar site in the first page of searching result. So if the link does not appear in the first page, I will assume that this faculty member does not have such website and ignore him/her. I believe with such an exact query, Google will give me the link as long as it does exist.
 ### Institution list processing
 In [`util.process_institutions`](src/util.py)
-- This is a truly annoying part. Google Scholar does not have a standard way of demonstrating a researcher's affiliated institution(s). The parsed result might be just the institution's name, or mix with stopwords, the researcher's title, position and/or other characters. This can result in duplicated representations of the same institution, wrong institution names or other weird behavior. I will try to tackle it with more rules and parse tools to minimize the negative effects.
+- This is a truly annoying part. Google Scholar does not have a standard way of demonstrating a researcher's affiliated institution(s). The parsed result might be just the institution's name, or mixed with stopwords, the researcher's title, position and/or other characters. For instance, it could be simply "Nanjing University", or "Professor, Nanjing University", or even "Professor, Institute of Computer System, Nanjing University, Jiangsu, China", so on and so forth. This can result in duplicated representations of the same institution, wrong institution names or other weird behavior. I will try to tackle it with more rules and parse tools to minimize the negative effects.
