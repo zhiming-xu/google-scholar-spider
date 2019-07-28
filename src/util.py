@@ -155,8 +155,8 @@ def google_search(query):
         page = requests.get(url=search_url, headers=header).text
     except:
         print('Error occurred when browsing with url {} in region {}'.format(url_prefix, region))
-        if url_prefix != google_sites[0]:
-            page = requests.get(url=google_sites[0], headers=header).text
+        if url_prefix != google_sites[0]['url']:
+            page = requests.get(url=google_sites[0]['url'], headers=header).text
         else:
             return None
     sp = BeautifulSoup(page, "html.parser")
