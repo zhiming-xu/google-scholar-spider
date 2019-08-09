@@ -77,6 +77,7 @@ def crawl_faculty_list(configs, target_alias=None):
             tree = etree.HTML(text)
             name_list = tree.xpath(univ['xpath'])
             if name_list:
+                # FIXME: ZJU has changed its url and website manifest, need rewrite this part
                 university_faculty[univ['university']] = name_list
                 print("-----finish faculty collection for {} after {:.3} sec------".format(univ['university'], \
                                                                                     time.time()-s_start))
