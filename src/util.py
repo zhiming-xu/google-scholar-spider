@@ -153,7 +153,7 @@ def google_search(query):
     header = random.choice(headers)
     # FIXME: I have already found some mistakes made by googling like this, e.g., an irrelevant faculty found
     try:
-        page = requests.get(url=search_url, headers=header).text
+        page = requests.get(url=search_url+query, headers=header).text
     except:
         print('Error occurred when browsing with url {} in region {}'.format(url_prefix, region))
         if url_prefix != google_sites[0]['url']:
