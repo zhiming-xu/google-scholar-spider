@@ -1,9 +1,29 @@
 ## Disclaimer
-The data collected by this program comes *wholely* from public domain, i.e., institutions' official websites, Google search results, and
-Google Scholar. Neither does it reflect my personal opinion nor serve as advise of any kind. The way how you interpret it
-depends solely on yourself: your idea, belief, personal experiences and/or any other things that could result in a particular
-attitude towards it. I modify nothing but make the data more readable and concise. There are a few issues which can produce potential
-mistakes. They are discussed in the following [Known Issues](#Known-Issues) part and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that part as well as codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
+The data collected by this program comes *wholely* from public domain, such as institutions' official websites, Google search results, and
+Google Scholar. Neither does it reflect my personal opinion nor serve as advice of any kind. The way how you interpret it
+depends solely on yourself: your idea, belief, personal experiences and/or any other backgrounds that could result in a particular
+attitude towards it. I modify nothing but make the data more readable and concise. There are a few issues which can result in certain
+mistakes, or possibly more. They are discussed in the following [Known Issues](#Known-Issues) section and also noted in codes as `FIXME`. If you are suspicious of any result, please consult that section as well as related codes first. Running this program *might* cause your IP address banned by Google and/or other websites' owners, whether temporarily or permanently. Before using it, you must be aware that it is all at your own risk. I am *by all means* not responsible for any direct and indirect consequences following such ban. This program comes with **ABSOLUTELY NO WARRANTY**, to the maximum extent permitted by law.
+
+<!-- TOC -->
+
+- [Disclaimer](#disclaimer)
+- [Quick view](#quick-view)
+- [Introduction](#introduction)
+  - [Pipeline](#pipeline)
+- [Usage](#usage)
+  - [Requirements](#requirements)
+  - [Command (Initial full release)](#command-initial-full-release)
+    - [Data collecting module](#data-collecting-module)
+    - [Statistics computing module](#statistics-computing-module)
+    - [Visualization module](#visualization-module)
+  - [Note](#note)
+- [Known Issues](#known-issues)
+  - [Name extracting](#name-extracting)
+  - [Google search](#google-search)
+  - [Institution list processing](#institution-list-processing)
+
+<!-- /TOC -->
 
 ## Quick view
 This is a connection figure demonstrating collected data. The x-axis shows the ratio of a faculty member's coauthors' affiliated institutions that are the same as himself/herself's. The y-axis shows the average number of unique collaborated institutions per faculty member has. The relative size of each circle represents the total number of faculty members that have known coauthors on Google Scholar.
