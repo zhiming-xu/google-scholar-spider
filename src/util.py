@@ -67,8 +67,8 @@ def crawl_faculty_list(configs, target_alias=None):
         s_start = time.time()
         if target_alias is not None and univ['alias'] not in target_alias:
             continue
-        retry_cnt = 10
-        while True:
+        attemp_cnt = 0
+        while attemp_cnt < 10:
             header = random.choice(headers)
             req = requests.get(univ['url'], headers=header)
             # gb2312 fails to encode some rare characters, so we change it to gbk
@@ -78,14 +78,13 @@ def crawl_faculty_list(configs, target_alias=None):
             name_list = tree.xpath(univ['xpath'])
             if name_list:
                 university_faculty[univ['university']] = name_list
-                print("-----finish faculty collection for {} after {:.3} sec------".format(univ['university'], \
+                print("-----finish faculty collection for {} after {:.3} sec-----".format(univ['university'], \
                                                                                     time.time()-s_start))
                 s_start = time.time()
                 break
-            retry_cnt -= 1
-            if retry_cnt == 0:
+            attemp_cnt += 1
+            if attemp_cnt == 10:
                 print('fail to find faculty for {} after 10 retries'.format(univ['university']))
-                break
     return university_faculty
 
 def extract_name(raw_dict):
@@ -99,12 +98,7 @@ def extract_name(raw_dict):
     '''
     for univ in raw_dict:
         for idx in range(len(raw_dict[univ])):
-            char_list = raw_dict[univ][idx].split(' ')
-            if len(char_list[0])>1:
-                name = char_list[0]
-            else:
-                name = raw_dict[univ][idx]
-            name = name.replace(u'\u3000', u'').replace(u'\xa0', u'').replace(' ', '')
+            name = raw_dict[univ][idx]
             name = name.split('(')[0].split('（')[0]
             raw_dict[univ][idx] = name
     return raw_dict
@@ -119,19 +113,19 @@ def name_to_pinyin(zh_dict):
         with form '[given name] [surname]'
     '''
     for univ in zh_dict:
+        if univ == 'Zhejiang University':   # we found the Pinyin name for zju faculty
+            for idx in range(len(zh_dict[univ])):
+                zh_dict[univ][idx] = ' '.join(reversed(zh_dict[univ][idx].split(' ')))
+            print(zh_dict[univ])
+            continue
         for idx in range(len(zh_dict[univ])):
             # FIXME: this method only works for surname of exactly one character, 
             # and does not take into composite surname, such as 欧阳
             full_name_zh = zh_dict[univ][idx]
-            surname = lazy_pinyin(full_name_zh[0])     # surname is a list of str
-            give_name = lazy_pinyin(full_name_zh[1:])  # given_name is a list of str
-            full_name_pinyin = ''
-            for char in give_name:
-                full_name_pinyin += char
-            full_name_pinyin += ' '
-            for char in surname:
-                full_name_pinyin += char
-            zh_dict[univ][idx] = full_name_pinyin
+            raw_pinyin = lazy_pinyin(full_name_zh)
+            raw_pinyin = [c for c in raw_pinyin if c.isalpha()]
+            zh_dict[univ][idx] = ''.join(raw_pinyin[1:]) + ' ' + raw_pinyin[0]
+        print(zh_dict[univ])
     return zh_dict
 
 def google_search(query):
