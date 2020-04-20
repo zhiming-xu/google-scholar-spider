@@ -19,8 +19,8 @@
     },
     {
         "university": "Zhejiang University",
-        "url": "http://www.cs.zju.edu.cn/chinese/redir.php?cust=jiaoshiml&id=256",
-        "xpath": "(//td[@class='szdw'])[position()<6]/div/a/text()",
+        "url": "http://www.en.cs.zju.edu.cn/asdasdf/list.htm",
+        "xpath": "//*[@id='wp_news_w7']/ul/li/table/tr/td/div[1]/ul/li/ul/li/a/text()",
         "alias": "zju"
     },
     {

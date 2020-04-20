@@ -77,7 +77,6 @@ def crawl_faculty_list(configs, target_alias=None):
             tree = etree.HTML(text)
             name_list = tree.xpath(univ['xpath'])
             if name_list:
-                # FIXME: ZJU has changed its url and website manifest, need rewrite this part
                 university_faculty[univ['university']] = name_list
                 print("-----finish faculty collection for {} after {:.3} sec------".format(univ['university'], \
                                                                                     time.time()-s_start))
@@ -226,11 +225,14 @@ def process_institutions(raw_list):
                 for party in interested_parties[ins]:
                     if party in entity:
                         found = True
+                        '''
                         # remove leading white space
                         while entity and entity[0].isalpha() is False:
                             entity = entity[1:]
                         while entity and entity[-1].isalpha() is False:
                             entity = entity[:-1]
+                        '''
+                        if entity: entity = entity.strip()  # remove leading and trailing spaces
                         # replace "&" with "and"
                         entity = entity.replace(' & ', ' and ').replace('at ', '')
                         # replace other punctuations, preserving only alphabet, digit, and white space

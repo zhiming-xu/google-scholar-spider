@@ -61,10 +61,9 @@ def find_connections(univ_faculty_collection):
     return connections
 
 if __name__ == '__main__':
-    target_alias = args.range
     if args.crawl:
-        print('-----begin to recollect connection------')
-        univ_faculty_collection = univ_collection(target_alias)
+        print('-----begin to recollect connection-----')
+        univ_faculty_collection = univ_collection(args.range)
         connection = find_connections(univ_faculty_collection)
     else:
         print('-----begin to recount connection-----')
