@@ -1,7 +1,5 @@
-import util
-import json
+import util, json, time
 from collections import defaultdict
-import time
 import argparse
 
 parser = argparse.ArgumentParser(description="collection connections and save in json format")

@@ -1,16 +1,17 @@
-import json
-import os
+import json, random, time, re
 from collections import defaultdict
 from pypinyin import lazy_pinyin
 import requests
 from lxml import etree
 from bs4 import BeautifulSoup
-import random, re, time
 import numpy as np
 from googletrans import Translator
 
 translator = Translator(service_urls=['translate.google.com'])
-random.seed(9102)
+random.seed(202)
+# use socks5 proxy for google sites as default, may change accordingly to other setup
+proxies=dict(http='socks5://127.0.0.1:1080', \
+             https='socks5://127.0.0.1:1080')
 
 def load_data(filename):
     '''
@@ -116,7 +117,6 @@ def name_to_pinyin(zh_dict):
         if univ == 'Zhejiang University':   # we found the Pinyin name for zju faculty
             for idx in range(len(zh_dict[univ])):
                 zh_dict[univ][idx] = ' '.join(reversed(zh_dict[univ][idx].split(' ')))
-            print(zh_dict[univ])
             continue
         for idx in range(len(zh_dict[univ])):
             # FIXME: this method only works for surname of exactly one character, 
@@ -125,7 +125,6 @@ def name_to_pinyin(zh_dict):
             raw_pinyin = lazy_pinyin(full_name_zh)
             raw_pinyin = [c for c in raw_pinyin if c.isalpha()]
             zh_dict[univ][idx] = ''.join(raw_pinyin[1:]) + ' ' + raw_pinyin[0]
-        print(zh_dict[univ])
     return zh_dict
 
 def google_search(query):
@@ -141,16 +140,15 @@ def google_search(query):
     region_url = random.choice(google_sites)
     region = region_url['region']
     url_prefix = region_url['url']
-    # query = query.replace(' ', '+') # convert space to + to insert in searching url
     search_url = url_prefix + query
     header = random.choice(headers)
     # FIXME: I have already found some mistakes made by googling like this, e.g., an irrelevant faculty found
     try:
-        page = requests.get(url=search_url+query, headers=header).text
+        page = requests.get(url=search_url+query, headers=header, proxies=proxies).text
     except:
         print('Error occurred when browsing with url {} in region {}'.format(url_prefix, region))
         if url_prefix != google_sites[0]['url']:
-            page = requests.get(url=google_sites[0]['url'], headers=header).text
+            page = requests.get(url=google_sites[0]['url'], headers=header, proxies=proxies).text
         else:
             return None
     sp = BeautifulSoup(page, "html.parser")
@@ -177,7 +175,7 @@ def parse_scholar(url, top_k=10):
     '''
     header = random.choice(headers)
     try:
-        page = requests.get(url, headers=header).text
+        page = requests.get(url, headers=header, proxies=proxies).text
     except:
         print('Error occurred when browsing google scholar page at {}'.format(url))
         return None
@@ -214,7 +212,6 @@ def process_institutions(raw_list):
         entities.reverse()  # university often comes after a specific institute or college, but the former is more useful
         for entity in entities:
             # address institution name in chinese
-            # entity = translator(entity, dest='en').text
             for ins in interested_parties:
                 for party in interested_parties[ins]:
                     if party in entity:
@@ -231,7 +228,7 @@ def process_institutions(raw_list):
                         entity = entity.replace(' & ', ' and ').replace('at ', '')
                         # replace other punctuations, preserving only alphabet, digit, and white space
                         entity = re.sub(r"[^a-zA-z0-9 -']", '', entity)
-                        processed_list.append(entity if ins!='single' else party)
+                        processed_list.append(entity if ins != 'single' else party)
                         break   # we will assume that each person is affiliated with only one institution
                 if found:
                     break
