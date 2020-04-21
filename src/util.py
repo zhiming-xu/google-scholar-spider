@@ -7,11 +7,10 @@ from bs4 import BeautifulSoup
 import numpy as np
 from googletrans import Translator
 
-translator = Translator(service_urls=['translate.google.com'])
+translator = Translator(service_urls=['translate.google.cn'])
 random.seed(202)
 # use socks5 proxy for google sites as default, may change accordingly to other setup
-proxies=dict(http='socks5://127.0.0.1:1080', \
-             https='socks5://127.0.0.1:1080')
+proxies=dict(http='socks5h://127.0.0.1:1080', https='socks5h://127.0.0.1:1080')
 
 def load_data(filename):
     '''

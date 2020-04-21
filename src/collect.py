@@ -46,7 +46,6 @@ def find_connections(univ_faculty_collection):
         for member in univ_faculty_collection[univ]:
             scholar_page = util.google_search(member+' '+univ)
             if scholar_page:
-                # time.sleep(random.randint(0, 1)) -> it appears that crawling google scholar user page is permitted
                 connection = util.parse_scholar(scholar_page)
                 # save the following line for compute_frequency
                 # we should be careful now since this could be empty
