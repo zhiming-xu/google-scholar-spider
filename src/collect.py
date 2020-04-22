@@ -53,7 +53,7 @@ def find_connections(univ_faculty_collection):
         connections[univ] = connection_dict
         print('-----finish connection finding for {} after {:.5} sec-----'.format(univ, time.time()-s_time))
         s_time = time.time()
-    with open('connections.json', 'w') as con:
+    with open('../result/connections.json', 'w') as con:
         json.dump(dict(connections), con)
     return connections
 
