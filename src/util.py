@@ -25,11 +25,11 @@ def load_data(filename):
     return ret
 
 # pretend to browse with some browsers on some platform (shamelessly)
-headers = load_data('../config/user-agent.json')
+headers = load_data('config/user-agent.json')
 
 # read all alternative google sites provided by search.json
 # search with them randomly to avoid being blocked by google (shamelessly +1)
-google_sites = load_data('../config/search.json')
+google_sites = load_data('config/search.json')
 
 # rules for parsing google scholar list
 interested_parties = {'composite': ['university', 'academy', 'institute'],
