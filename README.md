@@ -53,7 +53,7 @@ I have tested with the following config
 #### Data collecting module
 - `collect.py` can accept the following parameters
 ```
-$ python3 collect.py [-h] [--range RANGE] [--crawl CRAWL] [--connection CONNECTION]
+$ python3 src/collect.py [-h] [--range RANGE] [--crawl CRAWL] [--connection CONNECTION]
 
 collection connections and save in json format
 
@@ -78,7 +78,7 @@ optional arguments:
 #### Statistics computing module
 - `feature.py` can accept the following parameters
 ```
-$ python3 analyze.py [-h] [--connection CONNECTION] [--count COUNT]
+$ python3 src/feature.py [-h] [--connection CONNECTION] [--count COUNT]
                      [--top_k TOP_K] [--min_occur MIN_OCCUR]
 
 generate statistics and save them to a csv with collected data
@@ -100,7 +100,7 @@ optional arguments:
 #### Visualization module
 - `vis.py` can accept the following parameters
 ```
-$python3 vis.py [-h] [--stat STAT] [--plot_type PLOT_TYPE] [--fields FIELDS]
+$python3 src/vis.py [-h] [--stat STAT] [--plot_type PLOT_TYPE] [--fields FIELDS]
                 [--area AREA]
 
 provide visualization for statistics saved in the csv file

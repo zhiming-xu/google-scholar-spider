@@ -37,7 +37,7 @@ interested_parties = {'composite': ['university', 'academy', 'institute'],
                       'facebook', 'amazon', 'uber', 'intel', 'aws', 'apple', 'alibaba', 'baidu', \
                       'sensetime', 'face++', 'huawei', 'samsang', 'meituan', 'jd', 'didi']}
 
-def read_config(filename='../config/institutions.json'):
+def read_config(filename='config/institutions.json'):
     '''
     this function read configuration from config.json, which stores university name, url, xpath
     params:

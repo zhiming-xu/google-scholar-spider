@@ -9,7 +9,7 @@ import pandas as pd
 
 parser = argparse.ArgumentParser(description='provide visualization for statistics saved in the csv file')
 
-parser.add_argument('--stat', type=str, default='../result/stat.csv', help='path to the csv file saved by feature.py')
+parser.add_argument('--stat', type=str, default='result/stat.csv', help='path to the csv file saved by feature.py')
 parser.add_argument('--plot_type', type=int, default=2, help='choose visualization for data, 2 for 2d plots, 3 for 3d ones')
 parser.add_argument('--fields', type=str, default='inner_connection_ratio avg_connection_per_member', help='choose \
                     which fields in statistics to generate plot, the order is "data_x_dim data_y_dim" for 2d plots and \
@@ -52,7 +52,7 @@ def plot_field_2d(stat, fields, area):
         ax.scatter(x_axis[idx], y_axis[idx], s=area[idx]*1600, c=next(color_cycle), marker='o', alpha=.6)
         ax.annotate(row[1][0], (x_axis[idx], y_axis[idx]), (x_axis[idx]-offset1*len(row[1][0]), y_axis[idx]+offset2))
         idx += 1
-    plt.savefig('../result/demo-2d.png')
+    plt.savefig('result/demo-2d.png')
 
 def plot_field_3d(stat, fields, area):
     '''
@@ -89,7 +89,7 @@ def plot_field_3d(stat, fields, area):
     for _ in stat.iterrows():
         ax.scatter(x_axis[idx], y_axis[idx], z_axis[idx], s=area[idx]*2000, c=next(color_cycle), marker='o', alpha=.6)
         idx += 1
-    plt.savefig('../result/demo-3d.png')
+    plt.savefig('result/demo-3d.png')
 
 if __name__ == '__main__':
     try:

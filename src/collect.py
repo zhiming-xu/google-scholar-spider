@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description="collection connections and save in
 parser.add_argument('--range', type=str, default=None, help='the institutions you want to find connection for')
 parser.add_argument('--crawl', action='store_false', help='set to True if you want recollect connection, \
                     False if you want to use file specified by --connection')
-parser.add_argument('--connection', type=str, default='connections.json', help='the connection collected by this program, \
+parser.add_argument('--connection', type=str, default='result/connections.json', help='the connection collected by this program, \
                     it should be a dict of dict saved in json format, first key being institution name, second key being \
                     faculty member name')
 args = parser.parse_args()
@@ -22,7 +22,7 @@ def univ_collection(target_alias=None):
         defaultdict, each key is the university's name, and the value is a list of all faculty members' pinyin names
         with this alias
     '''
-    configs = util.read_config()
+    configs = util.read_config(filename='config/institutions.json')
     print('find connection for {}'.format(target_alias if target_alias else 'all'))
     univ_faculty_collection = util.crawl_faculty_list(configs, target_alias)
     univ_faculty_collection = util.extract_name(univ_faculty_collection)
@@ -53,7 +53,7 @@ def find_connections(univ_faculty_collection):
         connections[univ] = connection_dict
         print('-----finish connection finding for {} after {:.5} sec-----'.format(univ, time.time()-s_time))
         s_time = time.time()
-    with open('../result/connections.json', 'w') as con:
+    with open('result/connections.json', 'w') as con:
         json.dump(dict(connections), con)
     return connections
 

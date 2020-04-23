@@ -7,9 +7,9 @@ import argparse
 
 parser = argparse.ArgumentParser(description="generate statistics and save them to a csv with collected data")
 
-parser.add_argument('--connection', type=str, default='../result/connections.json', help= \
+parser.add_argument('--connection', type=str, default='result/connections.json', help= \
                     'path to load the the connections file collected by this program')
-parser.add_argument('--count', type=str, default='../result/counts.json', help= \
+parser.add_argument('--count', type=str, default='result/counts.json', help= \
                     'path to load the the counts file collected by this program, if set None, recompute the counts')
 parser.add_argument('--top_k', type=int, default=10, help='if recompute counts, take how many researchers a faculty \
                     member connects to into account')
@@ -120,7 +120,7 @@ def compute_stat():
         avg_connection_per_member: unique_connection / #member_w_connection
     '''
     try:
-        con = util.load_data('../result/connections.json')
+        con = util.load_data('result/connections.json')
     except:
         print('no connection file find, please make sure it exists, if not, try to generate with collect.py')
     if args.count != 'None':
@@ -136,4 +136,4 @@ if __name__=="__main__":
     stat = compute_stat()
     df_stat = pd.DataFrame.from_dict(stat, orient='index')
     # save the statistics to a csv
-    df_stat.to_csv('../result/stat.csv')
+    df_stat.to_csv('result/stat.csv')
