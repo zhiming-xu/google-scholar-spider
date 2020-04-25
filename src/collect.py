@@ -51,7 +51,7 @@ def find_connections(univ_faculty_collection):
                 # we should be careful now since this could be empty
                 connection_dict[member] = connection
         connections[univ] = connection_dict
-        print('-----finish connection finding for {} after {:.5} sec-----'.format(univ, time.time()-s_time))
+        print('-----finish connection finding for {} after {:.3} sec-----'.format(univ, time.time()-s_time))
         s_time = time.time()
     with open('result/connections.json', 'w') as con:
         json.dump(dict(connections), con)
